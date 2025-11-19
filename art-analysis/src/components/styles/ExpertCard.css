@@ -1,0 +1,200 @@
+/* ===================== ExpertCard ===================== */
+
+.expert-card {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 530px;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    box-sizing: border-box;
+    gap: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.expert-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+}
+
+/* ----- контент: текст + изображение ----- */
+.expert-card__row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 8px;
+    flex: 1;
+    align-items: flex-start;
+}
+
+/* ----- текст ----- */
+.expert-card__text {
+    flex: 1;
+    min-width: 0;
+}
+
+.expert-card__title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 6px 0;
+    color: #000;
+    word-wrap: break-word;
+    line-height: 1.15;
+}
+
+.expert-card__desc {
+    font-weight: 300;
+    font-size: 14px;
+    color: #333;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    margin: 0;
+    line-height: 1.35;
+}
+
+/* ----- изображение ----- */
+.expert-card__img {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    width: 180px;
+}
+
+.expert-card__img img {
+    width: 180px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* ===================== Атрибуты ===================== */
+
+.attribute-not-editable{
+    margin: 0 auto 10px 0;
+    font-size: 9px !important;
+    text-align: center !important;
+    color: #171717 !important;
+    background-color: #E0E0E0 !important;
+    width: 140px !important;
+    height: 20px !important;
+    border-radius: 10px;
+    padding-top: 5px;
+    box-sizing: border-box;
+}
+
+.attributes{
+    display: flex;
+    font-family: 'Roboto', Arial, sans-serif !important;
+    text-align: center !important;
+    margin: 0 auto 10px 0 !important;
+    width: 200px !important;
+    gap: 6px;
+    box-sizing: border-box;
+}
+
+.attribute-editable{
+    flex: 1;
+    font-size: 9px !important;
+    color: #0D4DD4 !important;
+    background-color: #D0E2FF !important;
+    width: 140px !important;
+    height: 20px !important;
+    border-radius: 10px;
+    padding-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.attribute-axis{
+    flex: 1;
+    font-size: 9px !important;
+    text-align: center !important;
+    color: #8448D7 !important;
+    background-color: #EADEFF !important;
+    width: 140px !important;
+    height: 20px !important;
+    border-radius: 10px;
+    padding-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+/* ===================== Кнопки ===================== */
+
+.expert-btn-add {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    color: #fff;
+    font-weight: 500;
+    background-color: rgba(52, 58, 63, 1);
+    padding: 12px 16px;
+    border-radius: 4px;
+    text-align: center;
+    display: inline-block;
+    width: fit-content;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.expert-btn-more {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    color: #a0a0a0;
+    font-weight: 500;
+    background-color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-align: center;
+    display: inline-block;
+    width: fit-content;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+/* hover / active / focus */
+
+.expert-btn-add:hover {
+    background-color: #000000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.18);
+}
+
+.expert-btn-add:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.expert-btn-add:focus {
+    outline: 2px solid #000000;
+    outline-offset: 2px;
+}
+
+.expert-btn-more:hover {
+    text-decoration: underline;
+    color: rgb(9,9,9);
+}
+
+/* ===================== Футер карточки ===================== */
+
+.expert-card__footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    align-items: center;
+}

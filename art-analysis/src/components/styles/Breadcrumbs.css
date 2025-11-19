@@ -1,0 +1,47 @@
+/* Контейнер хлебных крошек */
+.modern-breadcrumbs {
+    display: flex;
+    align-items: center;
+
+    padding: 0.5rem 0; /* минимализм, без карточек */
+
+    background: transparent; /* без плиток, как на Arts&Culture */
+    border: none;
+    box-shadow: none;
+}
+
+/* Элемент */
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+}
+
+/* Ссылка */
+.breadcrumb-link {
+    font-weight: 400;
+    font-size: 0.95rem;
+
+    color: #5f6368; /* Google UI серый */
+    text-decoration: none;
+
+    transition: color 0.2s ease-in-out;
+}
+
+.breadcrumb-link:hover {
+    color: #202124; /* глубокий Google-чёрный */
+}
+
+/* Активный сегмент */
+.breadcrumb-active {
+    font-weight: 500;
+    color: #202124;
+}
+
+/* Разделитель */
+.breadcrumb-separator {
+    margin: 0 0.6rem;
+    font-size: 0.9rem;
+
+    color: #bdc1c6; /* светло-серый Google */
+}
+
