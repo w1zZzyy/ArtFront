@@ -5,25 +5,36 @@ import './styles/ExpertCard.css';
 
 interface ExpertCardProps {
   expert: IArtExpert;
+  showExtra?: boolean;    // Name и Description
+  showDetails?: boolean;  // кнопка Подробнее
 }
 
-export const ExpertCard = ({ expert }: ExpertCardProps) => {
+export const ExpertCard = ({
+  expert,
+  showExtra = true,
+  showDetails = true
+}: ExpertCardProps) => {
   return (
     <Card className="expert-card h-100">
       <div className="expert-crd-cnt">
         {/* Текстовая часть */}
         <div className="expert-crd-txt">
-          {/* Имя эксперта с бейджем в зависимости от статуса */}
-          <div className="attributes">
-            {expert.Status ? (
-              <div className="attribute-editable">{expert.Name}</div>
-            ) : (
-              <div className="attribute-not-editable">{expert.Name}</div>
-            )}
-          </div>
+          {showExtra && (
+            <div className="attributes">
+              {expert.Status ? (
+                <div className="attribute-editable">{expert.Name}</div>
+              ) : (
+                <div className="attribute-not-editable">{expert.Name}</div>
+              )}
+            </div>
+          )}
 
           <h5 className="expert-crd-ttl">{expert.Title}</h5>
-          <p className="expert-crd-dscr">{expert.Description}</p>
+
+          {showExtra && (
+            <p className="expert-crd-dscr">{expert.Description}</p>
+          )}
+
           <p className="expert-crd-alg">
             <strong>Алгоритм:</strong> {expert.Algorithm}
           </p>
@@ -41,12 +52,14 @@ export const ExpertCard = ({ expert }: ExpertCardProps) => {
 
       {/* Футер карточки с кнопками */}
       <div className="expert-card__footer mt-3">
-        <a
-          href={`/expert/${expert.ID_artcenter}`}
-          className="expert-btn-more d-block text-center"
-        >
-          Подробнее
-        </a>
+        {showDetails && (
+          <a
+            href={`/expert/${expert.ID_artcenter}`}
+            className="expert-btn-more d-block text-center"
+          >
+            Подробнее
+          </a>
+        )}
 
         <form
           method="POST"

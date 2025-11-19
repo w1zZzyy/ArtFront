@@ -145,11 +145,11 @@ export const ExpertsList = () => {
           </div>
         ) : (
           <Row className="experts-templ">
-            <Col xs={12} lg={10}>
-              <Row xs={1} md={2} lg={2} xxl={2} className="g-4">
+            <Col xs={12}>
+              <Row xs={1} md={2} lg={3} xxl={3} className="g-4">
                 {experts.map(expert => (
                   <Col key={expert.ID_artcenter}>
-                    <ExpertCard expert={expert} />
+                    <ExpertCard expert={expert} showExtra={false} showDetails={true}/>
                   </Col>
                 ))}
               </Row>

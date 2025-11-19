@@ -1,4 +1,3 @@
-// src/pages/ExpertProp.tsx
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Container, Spinner, Row, Col, Button } from 'react-bootstrap';
@@ -64,7 +63,7 @@ export const ExpertProp = () => {
                             <img
                                 src={expert.Image || 'http://127.0.0.1:9000/art-center/imageError.gif'}
                                 alt={expert.Title}
-                                className="img-fluid"
+                                className="expert-prop-crd-img-inner"
                             />
                         </div>
                     </Col>
