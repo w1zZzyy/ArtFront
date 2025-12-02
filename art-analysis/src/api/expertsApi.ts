@@ -67,14 +67,14 @@ export const getArtExperts = async (title?: string): Promise<IArtExpert[]> => {
     
     try {
         const url = title
-            ? `/api/art-experts?title=${encodeURIComponent(title)}`
-            : '/api/art-experts';
+            ? `/api/experts?title=${encodeURIComponent(title)}`
+            : '/api/experts';
 
         const res = await fetchWithTimeout(url);
         if (!res.ok) throw new Error('Ошибка загрузки экспертов');
         return await res.json();
     } catch (error) {
-        console.warn('Ошибка при запросе art-experts, используем моки', error);
+        console.warn('Ошибка при запросе experts, используем моки', error);
         isBackendAvailable = false;
         return getMockArtExperts(title);
     }
@@ -92,7 +92,7 @@ export const getArtExpertById = async (id: string): Promise<IArtExpert> => {
     }
     
     try {
-        const response = await fetchWithTimeout(`/api/art-experts/${id}`);
+        const response = await fetchWithTimeout(`/api/experts/${id}`);
         if (!response.ok) throw new Error('Expert not found');
         return await response.json();
     } catch (error) {
