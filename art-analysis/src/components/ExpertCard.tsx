@@ -54,7 +54,7 @@ export const ExpertCard = ({
       <div className="expert-card__footer mt-3">
         {showDetails && (
           <a
-            href={`/expert/${expert.ID_artcenter}`}
+            href={`/expert_properties/${expert.ID_artcenter}`}
             className="expert-btn-more d-block text-center"
           >
             Подробнее
@@ -63,7 +63,7 @@ export const ExpertCard = ({
 
         <form
           method="POST"
-          action={`/analysis_order/add/expert/${expert.ID_artcenter}`}
+          action={`/center_request/add/expert/${expert.ID_artcenter}`}
           className="mt-2"
         >
           <button type="submit" className="expert-btn-add w-100">

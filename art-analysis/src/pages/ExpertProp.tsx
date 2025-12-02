@@ -78,7 +78,7 @@ export const ExpertProp = () => {
                         )}
 
                         <div className="expert-prop-actions mt-4">
-                            <form
+                            {/* <form
                                 method="POST"
                                 action={`/analysis_order/add/expert/${expert.ID_artcenter}`}
                             >
@@ -91,7 +91,7 @@ export const ExpertProp = () => {
                                 <button className="card-button-back w-100">
                                     Назад к списку экспертов
                                 </button>
-                            </Link>
+                            </Link> */}
                         </div>
                     </Col>
                 </Row>

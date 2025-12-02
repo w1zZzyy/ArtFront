@@ -21,7 +21,7 @@ function App() {
                 <Route path="/" element={<Navigate to="/ArtAnalysis" replace />} />
                 <Route path="/ArtAnalysis" element={<HomePage />} />
                 <Route path="/experts" element={<ExpertsList />} />
-                <Route path="/expert/:id" element={<ExpertProp />} />
+                <Route path="/expert_properties/:id" element={<ExpertProp />} />
                 <Route element={<MainLayout />}>
                 </Route>
                 <Route path="*" element={<div style={{ padding: 20 }}>Страница не найдена. Перейдите на <a href="/ArtAnalysis">Главную</a> или <a href="/experts">Список услуг</a>.</div>} />

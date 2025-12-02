@@ -64,12 +64,12 @@ export const ExpertsList = () => {
   };
 
   const handleAddToTask = async (expertId: number) => {
-    if (!draftTask || draftTask.OrderID === 0) {
+    if (!draftTask || draftTask.ID_task === 0) {
       alert('Сначала создайте черновик задачи!');
       return;
     }
     try {
-      console.log(`Добавление эксперта ${expertId} в задачу ${draftTask.OrderID}`);
+      console.log(`Добавление эксперта ${expertId} в задачу ${draftTask.ID_task}`);
       setDraftTask(prev => prev ? { ...prev, ExpertsCount: (prev.ExpertsCount || 0) + 1 } : null);
     } catch (err) {
       console.error('Ошибка добавления эксперта:', err);
@@ -107,7 +107,7 @@ export const ExpertsList = () => {
 
                 <div className="cart-wrapper">
                   {draftTask?.ExpertsCount && draftTask.ExpertsCount > 0 ? (
-                    <a href={`/analysis_order/${draftTask.OrderID}`} className="d-flex align-items-center">
+                    <a href={`/center_request/${draftTask.ID_task}`} className="d-flex align-items-center">
                       <Image
                         src="http://127.0.0.1:9000/art-center/basket.png"
                         alt="Корзина"

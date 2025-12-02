@@ -9,7 +9,7 @@ export interface IArtExpert {
 }
 
 export interface DraftTaskInfo {
-  OrderID: number;
+  ID_task: number;
   ExpertsCount: number;
 }
 
