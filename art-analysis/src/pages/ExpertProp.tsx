@@ -80,7 +80,7 @@ export const ExpertProp = () => {
                         <div className="expert-prop-actions mt-4">
                             {/* <form
                                 method="POST"
-                                action={`/analysis_order/add/expert/${expert.ID_artcenter}`}
+                                action={`/center_request/add/expert/${expert.ID_artcenter}`}
                             >
                                 <button type="submit" className="card-button-add w-100 mb-2">
                                     Добавить в заявку

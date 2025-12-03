@@ -1,7 +1,6 @@
 // src/components/ExpertCard.tsx
-import { Card } from 'react-bootstrap';
-import type { IArtExpert } from '../types/types';
 import './styles/ExpertCard.css';
+import type { IArtExpert } from '../types/types';
 
 interface ExpertCardProps {
   expert: IArtExpert;
@@ -13,11 +12,20 @@ export const ExpertCard = ({
   showExtra
 }: ExpertCardProps) => {
   return (
-    <Card className="expert-card h-100">
-      <div className="expert-crd-cnt">
-        {/* Текстовая часть */}
+    <div className="card expert-card">
+      {/* Изображение эксперта */}
+      <div className="expert-crd-img card-image">
+        <img
+          src={expert.img_url || 'http://localhost:9000/art-center/imageError.gif'}
+          alt={expert.title}
+        />
+      </div>
+
+      {/* Контент карточки */}
+      <div className="expert-crd-cnt card-content">
+        {/* Атрибуты/статус */}
         <div className="expert-crd-txt">
-          { (
+          {expert.name && (
             <div className="attributes">
               {expert.status ? (
                 <div className="attribute-editable">{expert.name}</div>
@@ -27,48 +35,36 @@ export const ExpertCard = ({
             </div>
           )}
 
-          <h5 className="expert-crd-ttl">{expert.title}</h5>
+          <h3 className="expert-crd-ttl">{expert.title}</h3>
 
-          {showExtra && (
-            <p className="expert-crd-dscr">{expert.description}</p>
-          )}
-
-          <p className="expert-crd-alg">
+          <p className="expert-crd-alg" style={{ margin: '0.05rem 0 0.5rem 0 !important' }}>
             <strong>Алгоритм:</strong> {expert.algorithm}
           </p>
+
+          {showExtra && expert.description && (
+            <p className="expert-crd-dscr">{expert.description}</p>
+          )}
         </div>
 
-        {/* Изображение эксперта */}
-        <div className="expert-crd-img">
-          <img
-            src={expert.img_url || 'http://localhost:9000/art-center/imageError.gif'}
-            alt={expert.title}
-            className="img-fluid"
-          />
-        </div>
-      </div>
-
-      {/* Футер карточки с кнопками */}
-      <div className="expert-card__footer mt-3">
-        { (
+        {/* Футер карточки с кнопками */}
+        <div className="expert-card__footer">
           <a
             href={`/expert_properties/${expert.id_artcenter}`}
-            className="expert-btn-more d-block text-center"
+            className="expert-btn-more card-button"
           >
             Подробнее
           </a>
-        )}
 
-        <form
-          method="POST"
-          action={`/center_request/add/expert/${expert.id_artcenter}`}
-          className="mt-2"
-        >
-          <button type="submit" className="expert-btn-add w-100">
-            Добавить в заявку
-          </button>
-        </form>
+          <form
+            method="POST"
+            action={`/center_request/add/expert/${expert.id_artcenter}`}
+          >
+            <button type="submit" className="expert-btn-add card-button">
+              Добавить в заявку
+            </button>
+          </form>
+        </div>
       </div>
-    </Card>
+    </div>
   );
 };

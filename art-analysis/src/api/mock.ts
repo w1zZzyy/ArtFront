@@ -3,40 +3,40 @@ import type { IArtExpert } from '../types/types';
 // Mock-данные (для разработки без бэкенда)
 export const MOCK_ART_EXPERTS: IArtExpert[] = [
   {
-    ID_artcenter: 1,
-    Title: "Анализ композиционного центра картины",
-    Description:
+    id_artcenter: 1,
+    title: "Анализ композиционного центра картины",
+    description:
       "Определение ключевой точки композиции, выявление фокуса и направления взгляда.",
-    Status: true,
-    Image: "http://localhost:9000/art-center/abstract_1.jpg",
-    Algorithm: "Визуальный анализ изображения",
-    Name: "Петр Иванов",
+    status: true,
+    img_url: "http://localhost:9000/art-center/abstract_1.jpg",
+    algorithm: "Визуальный анализ изображения",
+    name: "Петр Иванов",
   },
   {
-    ID_artcenter: 2,
-    Title: "Цветовой анализ произведений",
-    Description:
+    id_artcenter: 2,
+    title: "Цветовой анализ произведений",
+    description:
       "Комплексное исследование цветовой структуры художественных произведений. Анализ выявляет доминирующие цветовые палитры, контрасты и гармонические сочетания. Включает определение основных цветовых схем, распределение теплых и холодных тонов, оценку визуального воздействия цветовых комбинаций. Позволяет раскрыть художественный замысел через анализ цветовой выразительности.",
-    Status: true,
-    Image: "http://localhost:9000/art-center/abstract_2.jpg",
-    Algorithm: "Анализ цветовой гармонии изображения",
-    Name: "Анна Смирнова",
+    status: true,
+    img_url: "http://localhost:9000/art-center/abstract_2.jpg",
+    algorithm: "Анализ цветовой гармонии изображения",
+    name: "Анна Смирнова",
   },
   {
-    ID_artcenter: 3,
-    Title: "Оценка композиции фотографий",
-    Description:
+    id_artcenter: 3,
+    title: "Оценка композиции фотографий",
+    description:
       "Выявление сильных и слабых сторон композиции фотографии, рекомендации по улучшению.",
-    Status: true,
-    Image: "http://localhost:9000/art-center/abstract_3.jpg",
-    Algorithm: "Цифровой анализ",
-    Name: "Иван Петров",
+    status: true,
+    img_url: "http://localhost:9000/art-center/abstract_3.jpg",
+    algorithm: "Цифровой анализ",
+    name: "Иван Петров",
   },
 ];
 
 
 export const getMockArtExpertById = (id: string): IArtExpert | null => {
-  return MOCK_ART_EXPERTS.find(expert => expert.ID_artcenter === Number(id)) || null;
+  return MOCK_ART_EXPERTS.find(expert => expert.id_artcenter === Number(id)) || null;
 };
 
 
@@ -44,6 +44,6 @@ export const getMockArtExperts = (title?: string): IArtExpert[] => {
     if (!title) return MOCK_ART_EXPERTS;
 
     return MOCK_ART_EXPERTS.filter(expert =>
-        expert.Title.toLowerCase().includes(title.toLowerCase())
+        expert.title.toLowerCase().includes(title.toLowerCase())
     );
 };

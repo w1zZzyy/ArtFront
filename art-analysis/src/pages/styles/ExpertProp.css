@@ -6,6 +6,7 @@ html, body {
     height: 100%;
     background-color: #F4F4F4 !important;
     overflow-x: hidden;
+    font-size: 18px;
 }
 
 .expert-prop-body {
@@ -16,82 +17,103 @@ html, body {
 
 .expert-prop-start-text {
     text-align: center;
-    font-size: 22px;
-    font-weight: 500;
-    margin: 20px 0;
+    font-size: 28px; /* уменьшен с 32px */
+    font-weight: 600; /* немного меньше жирности */
+    margin: 25px 0;
+    color: #111;
+    letter-spacing: 0.5px;
 }
 
 /*-----------Card-----------*/
 .expert-prop-card {
     background-color: #ffffff;
-    border-radius: 10px;
-    padding: 30px;
+    border-radius: 12px;
+    padding: 30px; /* немного уменьшен padding */
     margin-bottom: 50px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.1);
 }
 
 /*-----------Image-----------*/
 .expert-prop-crd-img {
     width: 100%;
-    height: 300px; /* фиксированная высота для всех картинок */
+    height: 320px; /* немного уменьшена высота */
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 8px;
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
 
 .expert-prop-crd-img-inner {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* заполнение контейнера с обрезкой лишнего */
-    border-radius: 8px;
+    object-fit: cover;
+    border-radius: 10px;
 }
 
 /*-----------Content-----------*/
 .expert-prop-crd-ttl {
     font-family: 'Poppins', sans-serif;
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 10px;
+    font-size: 34px; /* уменьшен с 40px */
+    font-weight: 700; /* уменьшена жирность с 800 */
+    margin-bottom: 15px;
+    color: #000;
+    line-height: 1.2;
+    letter-spacing: 0.3px;
 }
 
 .expert-prop-crd-name,
 .expert-prop-crd-alg {
     font-family: 'Roboto', Arial, sans-serif;
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 6px;
+    font-size: 18px; /* уменьшен с 20px */
+    font-weight: 500; /* уменьшена жирность */
+    color: #222;
+    margin-bottom: 4px; /* УМЕНЬШЕН промежуток между строками */
+    line-height: 1.4; /* уменьшен line-height для компактности */
+}
+
+.expert-prop-crd-alg {
+    font-size: 17px; /* уменьшен с 20px */
+    color: #2c3e50;
+    margin-bottom: 15px; /* отступ перед описанием */
 }
 
 .expert-prop-crd-dscr {
     font-family: 'Roboto', Arial, sans-serif;
-    font-size: 14px;
-    color: #555;
-    margin-top: 10px;
+    font-size: 17px; /* уменьшен с 19px */
+    font-weight: 400; /* нормальная жирность */
+    color: #333;
+    margin-top: 15px; /* уменьшен отступ сверху */
+    line-height: 1.6;
+    padding: 12px; /* уменьшен padding */
+    background-color: #f9f9f9;
+    border-left: 3px solid #343a40; /* тоньше линия */
 }
 
 /*-----------Buttons-----------*/
 .card-button-add,
 .card-button-back {
     font-family: 'Poppins', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 12px 24px;
-    border-radius: 0;
+    font-size: 19px; /* уменьшен с 22px */
+    font-weight: 600; /* уменьшена жирность */
+    padding: 16px 30px; /* уменьшен padding */
+    border-radius: 6px;
     border: none;
     cursor: pointer;
     width: 100%;
     transition: all 0.3s ease;
     color: #fff;
     background-color: #343a40;
+    letter-spacing: 0.5px;
+    margin-top: 20px; /* уменьшен отступ сверху */
 }
 
 .card-button-add:hover,
 .card-button-back:hover {
     background-color: #000;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.25);
 }
 
 /*-----------Loading / Error-----------*/
@@ -100,14 +122,94 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 50vh;
+    min-height: 50vh; /* уменьшена высота */
     flex-direction: column;
     text-align: center;
+    font-size: 20px; /* уменьшен */
+    font-weight: 500;
+    color: #444;
+}
+
+.expert-prop-loading {
+    font-size: 22px; /* уменьшен */
 }
 
 /*-----------Responsive-----------*/
 @media (max-width: 768px) {
+    html, body {
+        font-size: 16px;
+    }
+    
     .expert-prop-crd-img {
-        height: 200px;
+        height: 250px;
+    }
+    
+    .expert-prop-start-text {
+        font-size: 24px;
+        margin: 20px 15px;
+    }
+    
+    .expert-prop-crd-ttl {
+        font-size: 28px;
+        margin-bottom: 12px;
+    }
+    
+    .expert-prop-crd-name {
+        font-size: 17px;
+        margin-bottom: 1px;
+    }
+    
+    .expert-prop-crd-alg {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+    
+    .expert-prop-crd-dscr {
+        font-size: 15px;
+        padding: 10px;
+        margin-top: 12px;
+    }
+    
+    .card-button-add,
+    .card-button-back {
+        font-size: 17px;
+        padding: 14px 20px;
+        margin-top: 15px;
+    }
+    
+    .expert-prop-loading,
+    .expert-prop-not-found {
+        font-size: 18px;
+        min-height: 40vh;
+    }
+}
+
+@media (max-width: 480px) {
+    .expert-prop-start-text {
+        font-size: 22px;
+    }
+    
+    .expert-prop-crd-ttl {
+        font-size: 26px;
+    }
+    
+    .expert-prop-crd-name,
+    .expert-prop-crd-alg,
+    .expert-prop-crd-dscr {
+        font-size: 15px;
+    }
+    
+    .expert-prop-crd-name {
+        margin-bottom: 0;
+    }
+    
+    .expert-prop-crd-alg {
+        margin-bottom: 10px;
+    }
+    
+    .card-button-add,
+    .card-button-back {
+        font-size: 16px;
+        padding: 12px 18px;
     }
 }
