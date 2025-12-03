@@ -1,11 +1,11 @@
 export interface IArtExpert {
-  ID_artcenter: number;
-  Title: string;
-  Description: string;
-  Status: boolean;
-  Image: string | null;
-  Name: string;
-  Algorithm: string;
+  id_artcenter: number;
+  title: string;
+  description: string;
+  status: boolean;
+  name: string;
+  algorithm: string;
+  img_url: string;
 }
 
 export interface DraftTaskInfo {

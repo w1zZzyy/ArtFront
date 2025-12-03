@@ -48,7 +48,7 @@ export const ExpertProp = () => {
 
     const breadcrumbs = [
         { label: 'Эксперты', path: '/experts' },
-        { label: expert.Title, active: true },
+        { label: expert.title, active: true },
     ];
 
     return (
@@ -61,19 +61,19 @@ export const ExpertProp = () => {
                     <Col lg={5} className="mb-4">
                         <div className="expert-prop-crd-img">
                             <img
-                                src={expert.Image || 'http://127.0.0.1:9000/art-center/imageError.gif'}
-                                alt={expert.Title}
+                                src={expert.img_url || 'http://127.0.0.1:9000/art-center/imageError.gif'}
+                                alt={expert.title}
                                 className="expert-prop-crd-img-inner"
                             />
                         </div>
                     </Col>
                     <Col lg={7}>
-                        <h2 className="expert-prop-crd-ttl">{expert.Title}</h2>
-                        <p className="expert-prop-crd-name"><strong>Эксперт:</strong> {expert.Name}</p>
-                        <p className="expert-prop-crd-alg"><strong>Алгоритм:</strong> {expert.Algorithm}</p>
-                        {expert.Description && (
+                        <h2 className="expert-prop-crd-ttl">{expert.title}</h2>
+                        <p className="expert-prop-crd-name"><strong>Эксперт:</strong> {expert.name}</p>
+                        <p className="expert-prop-crd-alg"><strong>Алгоритм:</strong> {expert.algorithm}</p>
+                        {expert.description && (
                             <div className="expert-prop-crd-dscr">
-                                <p>{expert.Description}</p>
+                                <p>{expert.description}</p>
                             </div>
                         )}
 

@@ -56,6 +56,20 @@ const fetchWithTimeout = async (
 // ============================
 //
 
+const normalizeExpertData = (data: any): IArtExpert => {
+    console.log('Нормализация данных эксперта:', data);
+    
+    return {
+        id_artcenter: data.id_artcenter || data.ID_artcenter || data.IdArtcenter || 0,
+        title: data.title || data.Title || '',
+        description: data.description || data.Description || '',
+        status: data.status !== undefined ? data.status : data.Status || false,
+        img_url: data.img_url || data.ImgURL || data.image_url || data.Image || null,
+        name: data.name || data.Name || '',
+        algorithm: data.algorithm || data.Algorithm || ''
+    };
+};
+
 // Получить список экспертов
 export const getArtExperts = async (title?: string): Promise<IArtExpert[]> => {
     const backendAvailable = await checkBackendAvailability();
@@ -94,8 +108,16 @@ export const getArtExpertById = async (id: string): Promise<IArtExpert> => {
     try {
         const response = await fetchWithTimeout(`/api/experts/${id}`);
         if (!response.ok) throw new Error('Expert not found');
-        return await response.json();
-    } catch (error) {
+        
+        const apiData = await response.json();
+        console.log('Эксперт с API по ID:', apiData);
+        
+        // Преобразуем данные
+        const expert = normalizeExpertData(apiData);
+        
+        console.log('Нормализованный эксперт:', expert);
+        return expert;
+    } catch (error: unknown) {
         console.warn('Ошибка при запросе эксперта по ID, используем моки', error);
         isBackendAvailable = false;
 

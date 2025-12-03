@@ -31,16 +31,8 @@ export const ExpertsList = () => {
     setLoading(true);
     setError(null);
     try {
-      if (USE_MOCK) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const filtered = MOCK_ART_EXPERTS.filter(expert =>
-          expert.Title.toLowerCase().includes(filterName.toLowerCase())
-        );
-        setExperts(filtered);
-      } else {
-        const data = await getArtExperts(filterName);
-        setExperts(Array.isArray(data) ? data : []);
-      }
+      const data = await getArtExperts(filterName);
+      setExperts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Ошибка загрузки экспертов:', err);
       setError('Не удалось загрузить список экспертов');
@@ -61,19 +53,6 @@ export const ExpertsList = () => {
   const handleSearchSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     fetchExperts(searchTerm);
-  };
-
-  const handleAddToTask = async (expertId: number) => {
-    if (!draftTask || draftTask.ID_task === 0) {
-      alert('Сначала создайте черновик задачи!');
-      return;
-    }
-    try {
-      console.log(`Добавление эксперта ${expertId} в задачу ${draftTask.ID_task}`);
-      setDraftTask(prev => prev ? { ...prev, ExpertsCount: (prev.ExpertsCount || 0) + 1 } : null);
-    } catch (err) {
-      console.error('Ошибка добавления эксперта:', err);
-    }
   };
 
   return (
@@ -148,8 +127,8 @@ export const ExpertsList = () => {
             <Col xs={12}>
               <Row xs={1} md={2} lg={3} xxl={3} className="g-4">
                 {experts.map(expert => (
-                  <Col key={expert.ID_artcenter}>
-                    <ExpertCard expert={expert} showExtra={false} showDetails={true}/>
+                  <Col key={expert.id_artcenter}>
+                    <ExpertCard expert={expert} showExtra={false}/>
                   </Col>
                 ))}
               </Row>
