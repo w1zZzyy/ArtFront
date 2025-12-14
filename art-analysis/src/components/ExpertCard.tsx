@@ -17,7 +17,7 @@ export const ExpertCard = ({
       {/* Изображение эксперта */}
       <div className="expert-crd-img card-image">
         <img
-          src={expert.img_url || 'http://localhost:9000/art-center/imageError.gif'}
+          src={expert.img_url || '/ArtFront/images/imageError.gif'}
           alt={expert.title}
         />
       </div>

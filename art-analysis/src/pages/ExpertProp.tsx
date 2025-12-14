@@ -61,7 +61,7 @@ export const ExpertProp = () => {
                     <Col lg={5} className="mb-4">
                         <div className="expert-prop-crd-img">
                             <img
-                                src={expert.img_url || 'http://127.0.0.1:9000/art-center/imageError.gif'}
+                                src={expert.img_url || '/ArtFront/images/imageError.gif'}
                                 alt={expert.title}
                                 className="expert-prop-crd-img-inner"
                             />

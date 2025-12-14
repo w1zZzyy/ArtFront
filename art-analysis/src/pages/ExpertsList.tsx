@@ -109,7 +109,7 @@ export const ExpertsList = () => {
                   {draftTask?.ExpertsCount && draftTask.ExpertsCount > 0 ? (
                     <a href={`/center_request/${draftTask.ID_task}`} className="d-flex align-items-center">
                       <Image
-                        src="http://127.0.0.1:9000/art-center/cart.png"
+                        src="/images/cart.png"
                         alt="Корзина"
                         width={60}
                         height={60}
@@ -118,7 +118,7 @@ export const ExpertsList = () => {
                   ) : (
                     <span style={{ cursor: 'not-allowed' }} className="d-flex align-items-center">
                       <Image
-                        src="http://127.0.0.1:9000/art-center/cart.png"
+                        src="/ArtFront/images/cart.png"
                         alt="Корзина"
                         width={60}
                         height={60}

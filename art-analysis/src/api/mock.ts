@@ -8,7 +8,7 @@ export const MOCK_ART_EXPERTS: IArtExpert[] = [
     description:
       "Определение ключевой точки композиции, выявление фокуса и направления взгляда.",
     status: true,
-    img_url: "http://localhost:9000/art-center/abstract_1.jpg",
+    img_url: "/ArtFront/images/abstract_1.jpg",
     algorithm: "Визуальный анализ изображения",
     name: "Петр Иванов",
   },
@@ -18,7 +18,7 @@ export const MOCK_ART_EXPERTS: IArtExpert[] = [
     description:
       "Комплексное исследование цветовой структуры художественных произведений. Анализ выявляет доминирующие цветовые палитры, контрасты и гармонические сочетания. Включает определение основных цветовых схем, распределение теплых и холодных тонов, оценку визуального воздействия цветовых комбинаций. Позволяет раскрыть художественный замысел через анализ цветовой выразительности.",
     status: true,
-    img_url: "http://localhost:9000/art-center/abstract_2.jpg",
+    img_url: "/ArtFront/images/abstract_2.jpg",
     algorithm: "Анализ цветовой гармонии изображения",
     name: "Анна Смирнова",
   },
@@ -28,7 +28,7 @@ export const MOCK_ART_EXPERTS: IArtExpert[] = [
     description:
       "Выявление сильных и слабых сторон композиции фотографии, рекомендации по улучшению.",
     status: true,
-    img_url: "http://localhost:9000/art-center/abstract_3.jpg",
+    img_url: "/ArtFront/images/abstract_3.jpg",
     algorithm: "Цифровой анализ",
     name: "Иван Петров",
   },
