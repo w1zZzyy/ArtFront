@@ -27,3 +27,6 @@ dist-ssr
 *.sln
 *.sw?
 .node_modules/*
+
+*.crt
+*.key

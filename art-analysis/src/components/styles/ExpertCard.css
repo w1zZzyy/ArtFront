@@ -164,3 +164,80 @@
     flex: 1; /* Форма тоже занимает равное место */
     display: flex;
 }
+
+/* ===================== Адаптивность ===================== */
+
+/* Планшеты (768px - 1024px) */
+@media (max-width: 1024px) {
+    .expert-card {
+        min-height: auto;
+        flex-direction: column;
+    }
+
+    .expert-crd-img {
+        height: 200px;
+    }
+
+    .expert-crd-img img {
+        height: 200px;
+    }
+
+    .expert-card__footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Мобильные устройства (до 767px) */
+@media (max-width: 767px) {
+    .expert-card {
+        width: 100%;
+        padding: 0.5rem;
+        min-height: auto;
+    }
+
+    .expert-crd-img {
+        height: 180px;
+    }
+
+    .expert-crd-img img {
+        height: 180px;
+    }
+
+    .expert-crd-txt {
+        padding: 0.75rem 0.75rem 0.5rem 0.75rem;
+    }
+
+    .expert-crd-ttl {
+        font-size: 1rem;
+    }
+
+    .expert-crd-dscr,
+    .expert-crd-alg {
+        font-size: 0.85rem;
+    }
+
+    .expert-card__footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .expert-btn-add,
+    .expert-btn-more {
+        flex: none;
+        width: 100%;
+        padding: 0.5rem 0;
+    }
+
+    .attributes {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .attribute-not-editable,
+    .attribute-editable,
+    .attribute-axis {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+    }
+}
