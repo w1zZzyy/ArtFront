@@ -10,7 +10,7 @@ html {
 
 /*===========Experts=list============*/
 .experts-body {
-    width: 100vw;
+    width: 100vw;    
     min-height: 100vh;
     margin: 52px 0 0 0;
     padding: 30px 0 0 0;
@@ -84,14 +84,12 @@ html {
     margin-left: 25px !important;
 }
 
-/*--------task-button--------*/
 .experts-t-b {
     flex: 0;
     z-index: 1000;
     display: flex;
 }
 
-/*-----------image overlay-----------*/
 .image-with-text {
     position: relative;
     display: inline-block;
@@ -100,7 +98,7 @@ html {
 .overlay-text {
     position: absolute;
     top: 50%;
-    left: 38%;
+    left: 50%;
     transform: translate(-50%, -50%);
     color: white;
     font-weight: bold;
@@ -130,26 +128,101 @@ html {
     max-width: 1400px;
 }
 
-/* Фиксированные размеры изображений карточек */
-.expert-crd-img {
-    width: 100%;
-    height: 200px; /* можно подкорректировать */
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.expert-crd-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* сохраняет пропорции и обрезает лишнее */
-}
-
-/* Выравнивание карточек по одинаковой высоте */
 .expert-card {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
+}
+
+/* Card image с пропорциями */
+.expert-crd-img {
+    width: 100%;
+    height: 0;
+    padding-top: 66%; /* соотношение 3:2 */
+    position: relative;
+    overflow: hidden;
+}
+
+.expert-crd-img img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/*==================Адаптивность==================*/
+
+/* Планшет и мобильные устройства */
+@media (max-width: 768px) {
+    .experts-s-f {
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 90%;
+        margin: 15px auto 30px;
+        gap: 8px !important;
+    }
+
+    .experts-s-f .form-control {
+        flex: 1 1 70%;
+        min-width: 180px;
+        font-size: 14px !important;
+    }
+
+    .experts-s-f .btn {
+        flex: 1 1 25%;
+        min-width: 80px;
+        font-size: 12px !important;
+    }
+
+    .cart-wrapper img {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .experts-templ {
+        gap: 20px;
+    }
+
+    .expert-crd-img {
+        padding-top: 75%; /* более квадратные изображения на мобилках */
+    }
+}
+
+/* Малые экраны (смартфоны) */
+@media (max-width: 480px) {
+    .experts-s-f {
+        max-width: 95%;
+        margin: 15px auto 30px;
+    }
+
+    .experts-s-f .form-control {
+        font-size: 12px !important;
+    }
+
+    .experts-s-f .btn {
+        font-size: 11px !important;
+    }
+
+    .cart-wrapper img {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+    .experts-templ {
+        gap: 16px;
+    }
+
+    .expert-crd-img {
+        padding-top: 80%; /* почти квадратные картинки */
+    }
+}
+
+/* Десктоп и большие экраны */
+@media (min-width: 769px) {
+    .expert-crd-img {
+        padding-top: 60%;
+    }
 }

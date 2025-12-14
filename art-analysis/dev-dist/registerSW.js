@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/ArtFront/dev-sw.js?dev-sw', { scope: '/ArtFront/', type: 'classic' })

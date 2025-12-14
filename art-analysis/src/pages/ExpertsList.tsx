@@ -18,20 +18,26 @@ import type { IArtExpert, DraftTaskInfo } from '../types/types';
 import { MOCK_ART_EXPERTS } from '../api/mock';
 import './styles/ExpertsList.css';
 
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState, AppDispatch } from '../store';
+import { setSearchTerm, selectSearchTerm } from '../store/filterSlice';
+
 export const ExpertsList = () => {
   const [experts, setExperts] = useState<IArtExpert[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [draftTask, setDraftTask] = useState<DraftTaskInfo | null>(null);
+  const [draftTask] = useState<DraftTaskInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const USE_MOCK = false; // true для mock-режима
+  const USE_MOCK = false;
 
-  const fetchExperts = async (filterName: string = '') => {
+  const searchTerm = useSelector((state: RootState) => selectSearchTerm(state));
+  const dispatch = useDispatch<AppDispatch>();
+
+  const fetchExperts = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getArtExperts(filterName);
+      const data = await getArtExperts(searchTerm);
       setExperts(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Ошибка загрузки экспертов:', err);
@@ -48,12 +54,27 @@ export const ExpertsList = () => {
 
   useEffect(() => {
     fetchExperts();
-  }, []);
+  }, [searchTerm]);
 
   const handleSearchSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    fetchExperts(searchTerm);
+    fetchExperts();
   };
+
+  const filteredExperts = experts
+  .filter(expert =>
+    expert.algorithm.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    expert.name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+  .sort((a, b) => {
+    const term = searchTerm.toLowerCase();
+    const aMatch = a.name.toLowerCase().startsWith(term) || a.algorithm.toLowerCase().startsWith(term);
+    const bMatch = b.name.toLowerCase().startsWith(term) || b.algorithm.toLowerCase().startsWith(term);
+    if (aMatch && !bMatch) return -1;
+    if (!aMatch && bMatch) return 1;
+    return 0;
+  });
+
 
   return (
     <div className="experts-body">
@@ -71,7 +92,7 @@ export const ExpertsList = () => {
                   type="search"
                   placeholder="Введите имя эксперта"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => dispatch(setSearchTerm(e.target.value))}
                   className="experts-s-f input flex-grow-1"
                 />
                 <Button
@@ -88,7 +109,7 @@ export const ExpertsList = () => {
                   {draftTask?.ExpertsCount && draftTask.ExpertsCount > 0 ? (
                     <a href={`/center_request/${draftTask.ID_task}`} className="d-flex align-items-center">
                       <Image
-                        src="http://127.0.0.1:9000/art-center/basket.png"
+                        src="http://127.0.0.1:9000/art-center/cart.png"
                         alt="Корзина"
                         width={60}
                         height={60}
@@ -97,7 +118,7 @@ export const ExpertsList = () => {
                   ) : (
                     <span style={{ cursor: 'not-allowed' }} className="d-flex align-items-center">
                       <Image
-                        src="http://127.0.0.1:9000/art-center/basket.png"
+                        src="http://127.0.0.1:9000/art-center/cart.png"
                         alt="Корзина"
                         width={60}
                         height={60}
@@ -126,7 +147,7 @@ export const ExpertsList = () => {
           <Row className="experts-templ">
             <Col xs={12}>
               <Row xs={1} md={2} lg={3} xxl={3} className="g-4">
-                {experts.map(expert => (
+                {filteredExperts.map(expert => (
                   <Col key={expert.id_artcenter}>
                     <ExpertCard expert={expert} showExtra={false}/>
                   </Col>

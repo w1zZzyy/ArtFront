@@ -1,14 +1,15 @@
 // src/components/ExpertCard.tsx
 import './styles/ExpertCard.css';
 import type { IArtExpert } from '../types/types';
+import { Link } from 'react-router-dom';
 
 interface ExpertCardProps {
   expert: IArtExpert;
-  showExtra?: boolean;    // Description
+  showExtra?: boolean; // Показать описание
 }
 
 export const ExpertCard = ({
-  expert, 
+  expert,
   showExtra
 }: ExpertCardProps) => {
   return (
@@ -23,7 +24,7 @@ export const ExpertCard = ({
 
       {/* Контент карточки */}
       <div className="expert-crd-cnt card-content">
-        {/* Атрибуты/статус */}
+        {/* Атрибуты / статус */}
         <div className="expert-crd-txt">
           {expert.name && (
             <div className="attributes">
@@ -48,13 +49,15 @@ export const ExpertCard = ({
 
         {/* Футер карточки с кнопками */}
         <div className="expert-card__footer">
-          <a
-            href={`/expert_properties/${expert.id_artcenter}`}
+          {/* Навигация через React Router */}
+          <Link
+            to={`/expert_properties/${expert.id_artcenter}`}
             className="expert-btn-more card-button"
           >
             Подробнее
-          </a>
+          </Link>
 
+          {/* Добавление в заявку */}
           <form
             method="POST"
             action={`/center_request/add/expert/${expert.id_artcenter}`}

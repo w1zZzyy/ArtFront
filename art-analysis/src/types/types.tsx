@@ -14,7 +14,11 @@ export interface DraftTaskInfo {
 }
 
 export interface Breadcrumb {
-    label: string;
-    path?: string;
-    active?: boolean;
+  label: string;
+  path?: string;
+  active?: boolean;
+}
+
+export interface FilterState {
+  searchTerm: string;
 }

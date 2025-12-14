@@ -15,8 +15,9 @@ const MainLayout = () => (
 
 function App() {
     return (
-        <BrowserRouter>
+        <BrowserRouter basename="/ArtFront"> 
             <Routes>
+                <Route path="/" element={<HomePage />} />
                 <Route path="/ArtAnalysis" element={<HomePage />} />
                 <Route path="/experts" element={<ExpertsList />} />
                 <Route path="/expert_properties/:id" element={<ExpertProp />} />
@@ -28,7 +29,3 @@ function App() {
 }
 
 export default App;
-/*
-<Route path="/factors" element={<FactorsListPage />} />
-<Route path="/factors/:id" element={<FactorDetailPage />} />
-*/
