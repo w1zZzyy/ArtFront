@@ -158,6 +158,11 @@
     text-decoration: none;
 }
 
+.expert-btn-add.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Форма внутри карточки */
 .expert-card__footer form {
     margin: 0;

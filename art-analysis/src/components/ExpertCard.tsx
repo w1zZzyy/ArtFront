@@ -2,19 +2,26 @@
 import './styles/ExpertCard.css';
 import type { IArtExpert } from '../types/types';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState, AppDispatch } from '../store';
+import { addExpertToDraft } from '../store/draftSlice'; // thunk добавления эксперта
 
 interface ExpertCardProps {
   expert: IArtExpert;
-  showExtra?: boolean; // Показать описание
+  showExtra?: boolean;
 }
 
-export const ExpertCard = ({
-  expert,
-  showExtra
-}: ExpertCardProps) => {
+export const ExpertCard = ({ expert, showExtra }: ExpertCardProps) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { isAuth } = useSelector((state: RootState) => state.auth);
+
+  const handleAddClick = () => {
+    if (!isAuth) return;
+    dispatch(addExpertToDraft(expert.id_artcenter));
+  };
+
   return (
     <div className="card expert-card">
-      {/* Изображение эксперта */}
       <div className="expert-crd-img card-image">
         <img
           src={expert.img_url || '/ArtFront/images/imageError.gif'}
@@ -22,34 +29,21 @@ export const ExpertCard = ({
         />
       </div>
 
-      {/* Контент карточки */}
       <div className="expert-crd-cnt card-content">
-        {/* Атрибуты / статус */}
         <div className="expert-crd-txt">
           {expert.name && (
-            <div className="attributes">
-              {expert.status ? (
-                <div className="attribute-editable">{expert.name}</div>
-              ) : (
-                <div className="attribute-not-editable">{expert.name}</div>
-              )}
+            <div className={expert.status ? 'attribute-editable' : 'attribute-not-editable'}>
+              {expert.name}
             </div>
           )}
-
           <h3 className="expert-crd-ttl">{expert.title}</h3>
-
-          <p className="expert-crd-alg" style={{ margin: '0.05rem 0 0.5rem 0 !important' }}>
-            <strong>Алгоритм:</strong> {expert.algorithm}
-          </p>
-
+          <p className="expert-crd-alg"><strong>Алгоритм:</strong> {expert.algorithm}</p>
           {showExtra && expert.description && (
             <p className="expert-crd-dscr">{expert.description}</p>
           )}
         </div>
 
-        {/* Футер карточки с кнопками */}
         <div className="expert-card__footer">
-          {/* Навигация через React Router */}
           <Link
             to={`/expert_properties/${expert.id_artcenter}`}
             className="expert-btn-more card-button"
@@ -57,15 +51,14 @@ export const ExpertCard = ({
             Подробнее
           </Link>
 
-          {/* Добавление в заявку */}
-          <form
-            method="POST"
-            action={`/center_request/add/expert/${expert.id_artcenter}`}
-          >
-            <button type="submit" className="expert-btn-add card-button">
+          {isAuth && (
+            <button
+              className="expert-btn-add card-button"
+              onClick={() => dispatch(addExpertToDraft(expert.id_artcenter))}
+            >
               Добавить в заявку
             </button>
-          </form>
+          )}
         </div>
       </div>
     </div>
