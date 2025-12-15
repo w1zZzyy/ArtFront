@@ -4,7 +4,6 @@ import type { IArtExpert } from '../types/types';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
-import { addExpertToDraft } from '../store/draftSlice'; // thunk добавления эксперта
 
 interface ExpertCardProps {
   expert: IArtExpert;
@@ -14,11 +13,6 @@ interface ExpertCardProps {
 export const ExpertCard = ({ expert, showExtra }: ExpertCardProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const { isAuth } = useSelector((state: RootState) => state.auth);
-
-  const handleAddClick = () => {
-    if (!isAuth) return;
-    dispatch(addExpertToDraft(expert.id_artcenter));
-  };
 
   return (
     <div className="card expert-card">
@@ -54,7 +48,6 @@ export const ExpertCard = ({ expert, showExtra }: ExpertCardProps) => {
           {isAuth && (
             <button
               className="expert-btn-add card-button"
-              onClick={() => dispatch(addExpertToDraft(expert.id_artcenter))}
             >
               Добавить в заявку
             </button>

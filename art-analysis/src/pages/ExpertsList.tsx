@@ -109,7 +109,7 @@ export const ExpertsList = () => {
                   {draftTask?.ExpertsCount && draftTask.ExpertsCount > 0 ? (
                     <a href={`/center_request/${draftTask.ID_task}`} className="d-flex align-items-center">
                       <Image
-                        src="/images/cart.png"
+                        src="/ArtFront/images/cart.png"
                         alt="Корзина"
                         width={60}
                         height={60}
