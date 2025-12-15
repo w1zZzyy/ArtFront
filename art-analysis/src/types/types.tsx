@@ -9,8 +9,8 @@ export interface IArtExpert {
 }
 
 export interface DraftTaskInfo {
-  ID_task: number;
-  ExpertsCount: number;
+  id_request: number;
+  experts_count: number;
 }
 
 export interface Breadcrumb {

@@ -1,8 +1,9 @@
 // src/api/artExpertsApi.ts
-import type { IArtExpert } from '../types/types';
+import type { IArtExpert, DraftTaskInfo } from '../types/types';
 import { 
     getMockArtExperts,
-    getMockArtExpertById
+    getMockArtExpertById, 
+    mockDraftTask
 } from './mock';
 
 // Состояние доступности бэкенда
@@ -124,6 +125,40 @@ export const getArtExpertById = async (id: string): Promise<IArtExpert> => {
         const expert = getMockArtExpertById(id);
         if (expert) return expert;
         throw new Error(`Эксперт с ID "${id}" не найден`);
+    }
+};
+
+
+export const getDraftTaskInfo = async (): Promise<DraftTaskInfo> => {
+    const backendAvailable = await checkBackendAvailability();
+    
+    if (!backendAvailable) {
+        console.log('Используем моковые данные для getDraftTaskInfo');
+        return mockDraftTask;
+    }
+    
+    try {
+        const token = localStorage.getItem('authToken'); 
+        console.log('Все ключи в localStorage:', Object.keys(localStorage));
+        console.log('authToken:', localStorage.getItem('authToken'));
+        console.log('token:', localStorage.getItem('token'));
+        console.log('localStorage.authToken:', localStorage.getItem('authToken'));
+        console.log('sessionStorage.authToken:', sessionStorage.getItem('authToken'));
+        if (!token) {
+            throw new Error('No auth token found');
+        }
+
+        const res = await fetchWithTimeout('/api/center_request/current',{
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        if (!res.ok) throw new Error('Ошибка загрузки черновика');
+        return await res.json();
+    } catch (error) {
+        console.warn('Ошибка при запросе черновика, используем моки', error);
+        isBackendAvailable = false;
+        return mockDraftTask;
     }
 };
 

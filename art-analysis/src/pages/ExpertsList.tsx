@@ -11,9 +11,10 @@ import {
   Button,
   Alert
 } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { AppNavbar } from '../components/Navbar';
 import { ExpertCard } from '../components/ExpertCard';
-import { getArtExperts } from '../api/expertsApi';
+import { getArtExperts, getDraftTaskInfo } from '../api/expertsApi';
 import type { IArtExpert, DraftTaskInfo } from '../types/types';
 import { MOCK_ART_EXPERTS } from '../api/mock';
 import './styles/ExpertsList.css';
@@ -25,7 +26,7 @@ import { setSearchTerm, selectSearchTerm } from '../store/filterSlice';
 export const ExpertsList = () => {
   const [experts, setExperts] = useState<IArtExpert[]>([]);
   const [loading, setLoading] = useState(true);
-  const [draftTask] = useState<DraftTaskInfo | null>(null);
+  const [draftTask, setDraftTask] = useState<DraftTaskInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const USE_MOCK = false;
@@ -52,8 +53,21 @@ export const ExpertsList = () => {
     }
   };
 
+  // Здесь можно вызывать API для получения текущего черновика
+  const fetchDraftTask = async () => {
+    try {
+      const task = await getDraftTaskInfo();
+      setDraftTask(task);
+      console.info('Проверка загрузки задачи:', task.experts_count);
+    } catch (err) {
+      console.error('Ошибка загрузки черновика:', err);
+      setDraftTask(null);
+    }
+  };
+
   useEffect(() => {
     fetchExperts();
+    fetchDraftTask();
   }, [searchTerm]);
 
   const handleSearchSubmit = (event: React.FormEvent) => {
@@ -62,19 +76,18 @@ export const ExpertsList = () => {
   };
 
   const filteredExperts = experts
-  .filter(expert =>
-    expert.algorithm.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    expert.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-  .sort((a, b) => {
-    const term = searchTerm.toLowerCase();
-    const aMatch = a.name.toLowerCase().startsWith(term) || a.algorithm.toLowerCase().startsWith(term);
-    const bMatch = b.name.toLowerCase().startsWith(term) || b.algorithm.toLowerCase().startsWith(term);
-    if (aMatch && !bMatch) return -1;
-    if (!aMatch && bMatch) return 1;
-    return 0;
-  });
-
+    .filter(expert =>
+      expert.algorithm.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      expert.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      const term = searchTerm.toLowerCase();
+      const aMatch = a.name.toLowerCase().startsWith(term) || a.algorithm.toLowerCase().startsWith(term);
+      const bMatch = b.name.toLowerCase().startsWith(term) || b.algorithm.toLowerCase().startsWith(term);
+      if (aMatch && !bMatch) return -1;
+      if (!aMatch && bMatch) return 1;
+      return 0;
+    });
 
   return (
     <div className="experts-body">
@@ -106,15 +119,18 @@ export const ExpertsList = () => {
                 </Button>
 
                 <div className="cart-wrapper">
-                  {draftTask?.ExpertsCount && draftTask.ExpertsCount > 0 ? (
-                    <a href={`/center_request/${draftTask.ID_task}`} className="d-flex align-items-center">
+                  {draftTask?.experts_count && draftTask.experts_count > 0 ? (
+                    <Link to={`/request/${draftTask.id_request}`} className="d-flex align-items-center">
                       <Image
                         src="/ArtFront/images/cart.png"
                         alt="Корзина"
                         width={60}
                         height={60}
                       />
-                    </a>
+                      <Badge pill bg="secondary" className="cart-indicator">
+                        {draftTask.experts_count}
+                      </Badge>
+                    </Link>
                   ) : (
                     <span style={{ cursor: 'not-allowed' }} className="d-flex align-items-center">
                       <Image
@@ -125,11 +141,6 @@ export const ExpertsList = () => {
                         style={{ opacity: 0.5 }}
                       />
                     </span>
-                  )}
-                  {draftTask?.ExpertsCount !== undefined && draftTask.ExpertsCount > 0 && (
-                    <Badge pill bg="secondary" className="cart-indicator">
-                      {draftTask.ExpertsCount}
-                    </Badge>
                   )}
                 </div>
               </div>

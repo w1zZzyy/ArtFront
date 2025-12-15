@@ -539,16 +539,34 @@ export class Api<
       }),
 
     /**
-     * @description Возвращает детальную информацию о заявке на анализ по её идентификатору
+     * @description Возвращает ID текущего чернового заказа и количество добавленных экспертов.
      *
      * @tags CenterRequest
      * @name CenterRequestCurrentList
-     * @summary Получить заявку по ID
+     * @summary Получить информацию о текущем черновом заказе
      * @request GET:/api/center_request/current
      */
-    centerRequestCurrentList: (id: number, params: RequestParams = {}) =>
+    centerRequestCurrentList: (params: RequestParams = {}) =>
+      this.request<HandlerDTORespCurrCenterRequestInfo, Record<string, string>>(
+        {
+          path: `/api/center_request/current`,
+          method: "GET",
+          format: "json",
+          ...params,
+        },
+      ),
+
+    /**
+     * @description Возвращает детальную информацию о заявке на анализ по её идентификатору
+     *
+     * @tags CenterRequest
+     * @name CenterRequestDetail
+     * @summary Получить заявку по ID
+     * @request GET:/api/center_request/{id}
+     */
+    centerRequestDetail: (id: number, params: RequestParams = {}) =>
       this.request<HandlerDTORespCenterRequest, string>({
-        path: `/api/center_request/current`,
+        path: `/api/center_request/${id}`,
         method: "GET",
         type: ContentType.Json,
         format: "json",

@@ -4,6 +4,8 @@ import type { IArtExpert } from '../types/types';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
+import { addExpertToDraft } from '../store/requestSlice';
+import { Button, Badge, Spinner } from 'react-bootstrap';
 
 interface ExpertCardProps {
   expert: IArtExpert;
@@ -13,6 +15,17 @@ interface ExpertCardProps {
 export const ExpertCard = ({ expert, showExtra }: ExpertCardProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const { isAuth } = useSelector((state: RootState) => state.auth);
+  const { currentRequest, addingExpert } = useSelector((state: RootState) => ({
+    currentRequest: state.request.currentRequest,
+    addingExpert: state.request.addingExpert, // нужно добавить в requestSlice
+  }));
+
+  const isInDraft = currentRequest?.experts?.some(e => e.id_artcenter === expert.id_artcenter);
+
+  const handleAddToRequest = () => {
+    if (!expert.id_artcenter) return;
+    dispatch(addExpertToDraft(expert.id_artcenter));
+  };
 
   return (
     <div className="card expert-card">
@@ -46,11 +59,28 @@ export const ExpertCard = ({ expert, showExtra }: ExpertCardProps) => {
           </Link>
 
           {isAuth && (
-            <button
+            <Button
               className="expert-btn-add card-button"
+              onClick={handleAddToRequest}
+              disabled={isInDraft || addingExpert === expert.id_artcenter}
+              variant={isInDraft ? 'outline-success' : 'success'}
+              size="sm"
             >
-              Добавить в заявку
-            </button>
+              {addingExpert === expert.id_artcenter ? (
+                <>
+                  <Spinner as="span" animation="border" size="sm" className="me-1" />
+                  Добавление...
+                </>
+              ) : isInDraft ? (
+                <>
+                  В заявке
+                </>
+              ) : (
+                <>
+                  Добавить
+                </>
+              )}
+            </Button>
           )}
         </div>
       </div>

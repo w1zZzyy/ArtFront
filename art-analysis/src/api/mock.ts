@@ -1,4 +1,4 @@
-import type { IArtExpert } from '../types/types';
+import type { IArtExpert, DraftTaskInfo } from '../types/types';
 
 // Mock-данные (для разработки без бэкенда)
 export const MOCK_ART_EXPERTS: IArtExpert[] = [
@@ -46,4 +46,10 @@ export const getMockArtExperts = (title?: string): IArtExpert[] => {
     return MOCK_ART_EXPERTS.filter(expert =>
         expert.title.toLowerCase().includes(title.toLowerCase())
     );
+};
+
+
+export const mockDraftTask: DraftTaskInfo = {
+    id_request: 1,
+    experts_count: 0,
 };
