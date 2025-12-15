@@ -33,9 +33,14 @@ export const AppNavbar = () => {
               </button>
             </>
           ) : (
-            <Link to="/login" className="btn btn-outline-dark btn-sm">
-              Войти
-            </Link>
+            <>
+              <Link to="/login" className="btn btn-outline-dark btn-sm">
+                Войти
+              </Link>
+              <Link to="/register" className="btn btn-outline-primary btn-sm">
+                Регистрация
+              </Link>
+            </>
           )}
         </div>
       </Container>

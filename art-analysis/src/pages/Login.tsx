@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
 import { loginThunk } from '../store/authSlice'
 import type { RootState, AppDispatch } from '../store'
@@ -40,7 +41,7 @@ export const Login = () => {
         {error && <div className="error">{error}</div>}
 
         <p className="register-text">
-          Нет аккаунта? <span className="register-link">Зарегистрироваться</span>
+          Нет аккаунта? <Link to="/register" className="register-link">Зарегистрироваться</Link>
         </p>
       </form>
     </div>

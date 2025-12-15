@@ -78,4 +78,21 @@ const authSlice = createSlice({
   },
 })
 
+interface RegisterPayload {
+  login: string;
+  password: string;
+}
+
+export const registerThunk = createAsyncThunk(
+  'auth/register',
+  async (payload: RegisterPayload, { rejectWithValue }) => {
+    try {
+      const res = await api.post('/users', payload);
+      return res.data; // вернёт DTO_Resp_User
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || 'Ошибка регистрации');
+    }
+  }
+);
+
 export default authSlice.reducer
