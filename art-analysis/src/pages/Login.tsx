@@ -1,21 +1,29 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux'
-import { loginThunk } from '../store/authSlice'
-import type { RootState, AppDispatch } from '../store'
-import './styles/Login.css'
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginThunk } from '../store/authSlice';
+import type { RootState, AppDispatch } from '../store';
+import './styles/Login.css';
 
 export const Login = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const { loading, error } = useSelector((s: RootState) => s.auth)
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const { loading, error, isAuth } = useSelector((s: RootState) => s.auth);
 
-  const [login, setLogin] = useState('')
-  const [password, setPassword] = useState('')
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
 
   const submit = (e: React.FormEvent) => {
-    e.preventDefault()
-    dispatch(loginThunk({ login, password }))
-  }
+    e.preventDefault();
+    dispatch(loginThunk({ login, password }));
+  };
+
+  // После успешного входа перенаправляем на страницу экспертов
+  useEffect(() => {
+    if (isAuth) {
+      navigate('/experts');
+    }
+  }, [isAuth, navigate]);
 
   return (
     <div className="login-container">
@@ -45,5 +53,5 @@ export const Login = () => {
         </p>
       </form>
     </div>
-  )
-}
+  );
+};

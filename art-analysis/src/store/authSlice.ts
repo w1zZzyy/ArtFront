@@ -1,98 +1,106 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { api } from '../api/axios'
+// src/store/authSlice.ts
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { Api, HandlerDTOReqUserReg, HandlerDTORespTokenLogin, HandlerDTORespUser } from '../api/generated/api';
 
-interface LoginPayload {
-  login: string
-  password: string
-}
+const api = new Api(); // создаем экземпляр API-клиента
 
-interface User {
-  id_user: number
-  login: string
-  is_admin: boolean
-}
-
-interface AuthState {
-  token: string | null
-  user: User | null
-  isAuth: boolean
-  loading: boolean
-  error: string | null
+export interface AuthState {
+  isAuth: boolean;
+  user: HandlerDTORespUser | null;
+  token: string | null;
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: AuthState = {
-  token: localStorage.getItem('token'),
-  user: localStorage.getItem('user')
-    ? JSON.parse(localStorage.getItem('user')!)
-    : null,
-  isAuth: !!localStorage.getItem('token'),
+  isAuth: false,
+  user: null,
+  token: null,
   loading: false,
   error: null,
-}
+};
 
-export const loginThunk = createAsyncThunk(
-  'auth/login',
-  async (payload: LoginPayload) => {
-    const res = await api.post('/login', payload)
-    return res.data
+// Thunk для логина
+export const loginThunk = createAsyncThunk<
+  HandlerDTORespTokenLogin,
+  HandlerDTOReqUserReg,
+  { rejectValue: string }
+>('auth/login', async (payload, { rejectWithValue }) => {
+  try {
+    const res = await api.login.loginCreate(payload);
+    return res.data;
+  } catch (err: any) {
+    return rejectWithValue(err.response?.data || err.message || 'Ошибка авторизации');
   }
-)
+});
 
-export const logoutThunk = createAsyncThunk(
-  'auth/logout',
-  async () => {
-    await api.post('/api/auth/logout')
+// Thunk для регистрации
+export const registerThunk = createAsyncThunk<
+  HandlerDTORespUser,
+  HandlerDTOReqUserReg,
+  { rejectValue: string }
+>('auth/register', async (payload, { rejectWithValue }) => {
+  try {
+    const res = await api.users.usersCreate(payload);
+    return res.data;
+  } catch (err: any) {
+    return rejectWithValue(err.response?.data || err.message || 'Ошибка регистрации');
   }
-)
+});
 
-const authSlice = createSlice({
+// Thunk для выхода
+export const logoutThunk = createAsyncThunk('auth/logout', async () => {
+  try {
+    await api.api.authLogoutCreate();
+  } catch (err) {
+    console.error('Ошибка выхода:', err);
+  }
+});
+
+// Slice
+export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {},
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder
-      .addCase(loginThunk.pending, state => {
-        state.loading = true
-        state.error = null
+      .addCase(loginThunk.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(loginThunk.fulfilled, (state, action: PayloadAction<HandlerDTORespTokenLogin>) => {
+        state.loading = false;
+        state.isAuth = true;
+        state.user = action.payload.user || null;
+        state.token = action.payload.token || null;
+        state.error = null;
       })
-      .addCase(loginThunk.fulfilled, (state, action) => {
-        state.loading = false
-        state.token = action.payload.token
-        state.user = action.payload.user
-        state.isAuth = true
-
-        localStorage.setItem('token', action.payload.token)
-        localStorage.setItem('user', JSON.stringify(action.payload.user))
+      .addCase(loginThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.isAuth = false;
+        state.user = null;
+        state.token = null;
+        state.error = action.payload || 'Ошибка авторизации';
       })
-      .addCase(loginThunk.rejected, state => {
-        state.loading = false
-        state.error = 'Неверный логин или пароль'
+      .addCase(registerThunk.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(registerThunk.fulfilled, (state, action: PayloadAction<HandlerDTORespUser>) => {
+        state.loading = false;
+        state.isAuth = true;
+        state.user = action.payload;
+        state.token = null;
+        state.error = null;
       })
-      .addCase(logoutThunk.fulfilled, state => {
-        state.token = null
-        state.user = null
-        state.isAuth = false
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
+      .addCase(registerThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.isAuth = false;
+        state.user = null;
+        state.token = null;
+        state.error = action.payload || 'Ошибка регистрации';
       })
+      .addCase(logoutThunk.fulfilled, (state) => {
+        state.isAuth = false;
+        state.user = null;
+        state.token = null;
+        state.error = null;
+      });
   },
-})
+});
 
-interface RegisterPayload {
-  login: string;
-  password: string;
-}
-
-export const registerThunk = createAsyncThunk(
-  'auth/register',
-  async (payload: RegisterPayload, { rejectWithValue }) => {
-    try {
-      const res = await api.post('/users', payload);
-      return res.data; // вернёт DTO_Resp_User
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data || 'Ошибка регистрации');
-    }
-  }
-);
-
-export default authSlice.reducer
+export default authSlice.reducer;
