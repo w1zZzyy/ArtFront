@@ -14,10 +14,15 @@ export const AppNavbar = () => {
           ArtAnalysis
         </Navbar.Brand>
 
-        <div className="me-auto">
+        <div className="me-auto d-flex gap-4">
           <Link to="/experts" className="fs-5 text-dark text-decoration-none">
             Experts
           </Link>
+          {isAuth && (
+            <Link to="/requests" className="fs-5 text-dark text-decoration-none">
+              History
+            </Link>
+          )}
         </div>
 
         {/* AUTH BLOCK */}

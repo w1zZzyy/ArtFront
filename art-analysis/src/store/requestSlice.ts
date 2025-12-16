@@ -38,6 +38,38 @@ export const setAddingExpert = createAction<number | null>('request/setAddingExp
 
 // --- Thunks ---
 
+// Получить список всех заявок
+export const fetchRequestsList = createAsyncThunk<
+  HandlerDTORespCenterRequest[],
+  { status?: string; from?: string; to?: string } | undefined,
+  { rejectValue: string }
+>(
+  'request/fetchList',
+  async (filters = {}, { rejectWithValue }) => {
+    try {
+      const query: any = {};
+      if (filters.status && filters.status !== 'all') {
+        query.status = filters.status;
+      }
+      if (filters.from) {
+        query.from = filters.from;
+      }
+      if (filters.to) {
+        query.to = filters.to;
+      }
+      console.log('fetchRequestsList: query =', query);
+      console.log('fetchRequestsList: token =', localStorage.getItem('authToken'));
+      const res = await api.api.centerRequestList(query);
+      console.log('fetchRequestsList: response =', res.data);
+      console.log('fetchRequestsList: full response =', res);
+      return res.data;
+    } catch (err: any) {
+      console.error('fetchRequestsList: error =', err);
+      return rejectWithValue('Не удалось загрузить список заявок');
+    }
+  }
+);
+
 // Получить текущий черновик
 export const fetchCurrentDraftInfo = createAsyncThunk(
   'request/fetchCurrentDraftInfo',
@@ -262,6 +294,21 @@ const requestSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // fetchRequestsList
+    builder
+      .addCase(fetchRequestsList.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchRequestsList.fulfilled, (state, action) => {
+        state.loading = false;
+        state.list = action.payload;
+      })
+      .addCase(fetchRequestsList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
     // fetchCurrentDraftInfo
     builder
       .addCase(fetchCurrentDraftInfo.pending, (state) => {

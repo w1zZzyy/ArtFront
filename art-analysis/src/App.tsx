@@ -6,6 +6,7 @@ import { ExpertProp } from './pages/ExpertProp';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { UserPage } from './pages/UserPage';
+import { RequestsList } from './pages/RequestsList';
 import RequestPage  from './pages/RequestPage';
 
 const MainLayout = () => (
@@ -29,6 +30,7 @@ function App() {
                 <Route path="/request/:id" element={<RequestPage />} />
                 <Route path="/expert_properties/:id" element={<ExpertProp />} />
                 <Route path="/profile" element={<UserPage />} />
+                <Route path="/requests" element={<RequestsList />} />
                 <Route element={<MainLayout />}>
                 </Route>
             </Routes>
