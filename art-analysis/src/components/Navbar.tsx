@@ -24,11 +24,22 @@ export const AppNavbar = () => {
         <div className="d-flex align-items-center gap-3">
           {isAuth ? (
             <>
-              <img 
-                src="/ArtFront/images/profile.png" 
-                alt="Profile" 
-                style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}
-              />
+              <Link to="/profile" style={{ textDecoration: 'none' }}>
+                <img 
+                  src="/ArtFront/images/profile.png" 
+                  alt="Profile" 
+                  style={{ 
+                    width: '32px', 
+                    height: '32px', 
+                    borderRadius: '50%', 
+                    objectFit: 'cover',
+                    cursor: 'pointer',
+                    transition: 'transform 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                />
+              </Link>
               <span className="fw-semibold">{user?.login}</span>
               <button
                 className="btn btn-outline-dark btn-sm"

@@ -1,7 +1,8 @@
 // src/store/authSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { 
-    HandlerDTOReqUserReg, 
+    HandlerDTOReqUserReg,
+    HandlerDTOReqUserUpd,
     HandlerDTORespTokenLogin, 
     HandlerDTORespUser 
 } from '../api/generated/api';
@@ -71,16 +72,52 @@ export const registerThunk = createAsyncThunk<
   }
 });
 
+// Thunk для получения текущего пользователя
+export const getMeThunk = createAsyncThunk<
+  HandlerDTORespUser,
+  void,
+  { rejectValue: string }
+>('auth/getMe', async (_, { rejectWithValue }) => {
+  try {
+    console.log('GET ME THUNK: fetching current user');
+    const res = await api.api.usersMeList();
+    console.log('GET ME THUNK: response data', res.data);
+    if (res.data) {
+      localStorage.setItem('userInfo', JSON.stringify(res.data));
+    }
+    return res.data;
+  } catch (err: any) {
+    console.error('GET ME THUNK ERROR', err.response?.data || err.message);
+    return rejectWithValue(err.response?.data || err.message || 'Ошибка получения данных пользователя');
+  }
+});
+
+// Thunk для обновления данных пользователя (пароль)
+export const updateMeThunk = createAsyncThunk<
+  HandlerDTORespUser,
+  HandlerDTOReqUserUpd,
+  { rejectValue: string }
+>('auth/updateMe', async (payload, { rejectWithValue }) => {
+  try {
+    console.log('UPDATE ME THUNK: payload', payload);
+    const res = await api.api.usersMeUpdate(payload);
+    console.log('UPDATE ME THUNK: response data', res.data);
+    if (res.data) {
+      localStorage.setItem('userInfo', JSON.stringify(res.data));
+    }
+    return res.data;
+  } catch (err: any) {
+    console.error('UPDATE ME THUNK ERROR', err.response?.data || err.message);
+    return rejectWithValue(err.response?.data || err.message || 'Ошибка обновления данных пользователя');
+  }
+});
+
 // Thunk для выхода
 export const logoutThunk = createAsyncThunk('auth/logout', async () => {
   try {
-    const token = localStorage.getItem('authToken');
-    console.log('LOGOUT THUNK: token from localStorage', token);
-    if (token) {
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await (api.api.authLogoutCreate as any)(config);
-      console.log('LOGOUT THUNK: logout request sent');
-    }
+    console.log('LOGOUT THUNK: sending logout request');
+    await api.api.authLogoutCreate();
+    console.log('LOGOUT THUNK: logout request sent');
   } catch (err) {
     console.error('LOGOUT THUNK ERROR:', err);
   } finally {
@@ -97,6 +134,7 @@ export const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Login cases
       .addCase(loginThunk.pending, (state) => { 
         state.loading = true; 
         state.error = null; 
@@ -118,6 +156,7 @@ export const authSlice = createSlice({
         state.error = action.payload || 'Ошибка авторизации';
         console.log('LOGIN REJECTED: state', state);
       })
+      // Register cases
       .addCase(registerThunk.pending, (state) => { 
         state.loading = true; 
         state.error = null; 
@@ -127,7 +166,7 @@ export const authSlice = createSlice({
         state.loading = false;
         state.isAuth = true;
         state.user = action.payload;
-        state.token = localStorage.getItem('authToken'); // может быть null
+        state.token = localStorage.getItem('authToken');
         state.error = null;
         console.log('REGISTER FULFILLED: state', state);
       })
@@ -139,6 +178,41 @@ export const authSlice = createSlice({
         state.error = action.payload || 'Ошибка регистрации';
         console.log('REGISTER REJECTED: state', state);
       })
+      // Get Me cases
+      .addCase(getMeThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        console.log('GET ME PENDING: state', state);
+      })
+      .addCase(getMeThunk.fulfilled, (state, action: PayloadAction<HandlerDTORespUser>) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.error = null;
+        console.log('GET ME FULFILLED: state', state);
+      })
+      .addCase(getMeThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Ошибка получения данных пользователя';
+        console.log('GET ME REJECTED: state', state);
+      })
+      // Update Me cases
+      .addCase(updateMeThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        console.log('UPDATE ME PENDING: state', state);
+      })
+      .addCase(updateMeThunk.fulfilled, (state, action: PayloadAction<HandlerDTORespUser>) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.error = null;
+        console.log('UPDATE ME FULFILLED: state', state);
+      })
+      .addCase(updateMeThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Ошибка обновления данных пользователя';
+        console.log('UPDATE ME REJECTED: state', state);
+      })
+      // Logout case
       .addCase(logoutThunk.fulfilled, (state) => {
         state.isAuth = false;
         state.user = null;

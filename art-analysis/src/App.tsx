@@ -5,6 +5,7 @@ import { ExpertsList } from './pages/ExpertsList';
 import { ExpertProp } from './pages/ExpertProp';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { UserPage } from './pages/UserPage';
 import RequestPage  from './pages/RequestPage';
 
 const MainLayout = () => (
@@ -27,6 +28,7 @@ function App() {
                 <Route path="/experts" element={<ExpertsList />} />
                 <Route path="/request/:id" element={<RequestPage />} />
                 <Route path="/expert_properties/:id" element={<ExpertProp />} />
+                <Route path="/profile" element={<UserPage />} />
                 <Route element={<MainLayout />}>
                 </Route>
             </Routes>
