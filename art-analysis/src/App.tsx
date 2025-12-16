@@ -5,7 +5,7 @@ import { ExpertsList } from './pages/ExpertsList';
 import { ExpertProp } from './pages/ExpertProp';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
-import { RequestPage } from './pages/RequestPage';
+import RequestPage  from './pages/RequestPage';
 
 const MainLayout = () => (
     <>

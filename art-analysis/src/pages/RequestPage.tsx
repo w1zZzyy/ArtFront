@@ -1,137 +1,225 @@
-// src/pages/RequestPage.tsx
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Trash } from 'react-bootstrap-icons';
 import './styles/RequestPage.css';
 import { AppNavbar } from '../components/Navbar';
-import { RootState, AppDispatch } from '../store';
-import { deleteRequest, fetchRequestById, clearCurrentRequest } from '../store/requestSlice';
-import { api } from '../api'; // <-- импортируем глобальный api с securityWorker
-import type { HandlerDTORespCenterRequestExpert, HandlerDTORespCenterRequest } from '../api/generated/api';
 
-export const RequestPage = () => {
-  const { id } = useParams<{ id: string }>();
+import {
+  fetchCurrentDraftRequest,
+  updateRequestDescription,
+  deleteRequest,
+  removeExpertFromRequest,
+  formRequest,
+  resetOperationSuccess,
+  clearCurrentRequest,
+} from '../store/requestSlice';
+
+import type { AppDispatch, RootState } from '../store';
+import type { ModelExpertsToRequest } from '../api/generated/api';
+
+const RequestPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { currentRequest, loading, error } = useSelector((state: RootState) => state.request);
 
-  const [expertsWithImages, setExpertsWithImages] = useState<(HandlerDTORespCenterRequestExpert & { img_url?: string })[]>([]);
+  const {
+    currentRequest,
+    loading,
+    operationSuccess,
+    expertsById,
+  } = useSelector((state: RootState) => state.request);
 
-  // Загрузка заявки по ID
   useEffect(() => {
-    if (id) {
-      dispatch(fetchRequestById(Number(id)));
-    }
+    dispatch(fetchCurrentDraftRequest());
 
     return () => {
       dispatch(clearCurrentRequest());
+      dispatch(resetOperationSuccess());
     };
-  }, [id, dispatch]);
+  }, [dispatch]);
 
-  // Загрузка данных экспертов (img_url)
   useEffect(() => {
-    if (currentRequest?.experts?.length) {
-      Promise.all(
-        currentRequest.experts.map(async (e) => {
-          if (e.id_artcenter == null) return e;
-          try {
-            const res = await api.api.expertsDetail(Number(e.id_artcenter));
-            return { ...e, ...res.data };
-          } catch (err) {
-            console.error('Ошибка загрузки эксперта:', err);
-            return e;
-          }
-        })
-      ).then(setExpertsWithImages);
-    } else {
-      setExpertsWithImages([]);
-    }
-  }, [currentRequest]);
+    if (operationSuccess) navigate('/');
+  }, [operationSuccess, navigate]);
 
-  const handleDeleteRequest = () => {
-    if (currentRequest?.id_request && confirm('Удалить заявку? Это действие нельзя отменить.')) {
-      dispatch(deleteRequest(currentRequest.id_request));
-      navigate('/');
+  if (loading || !currentRequest) {
+    return (
+      <div className="request-loading-container">
+        <div className="request-spinner" />
+        <span>Загрузка…</span>
+      </div>
+    );
+  }
+
+  const requestId = currentRequest.id_request;
+  const expertLinks = currentRequest.experts ?? [];
+
+  const handleSaveDescription = () => {
+    if (requestId) {
+      dispatch(
+        updateRequestDescription({
+          id: requestId,
+          description: currentRequest.description ?? '',
+        })
+      );
     }
   };
 
-  if (loading) {
-    return <div className="request-loading">Загрузка…</div>;
-  }
-
-  if (error) {
-    return <div className="request-error">{error}</div>;
-  }
-
-  if (!currentRequest) {
-    return <div className="request-empty">Заявка не найдена</div>;
-  }
+  const handleFormRequest = () => {
+    if (requestId) {
+      if (confirm('Сформировать заявку? Это действие нельзя отменить.')) {
+        dispatch(formRequest(requestId));
+      }
+    }
+  };
 
   return (
     <div className="request-body">
       <AppNavbar />
-      <header className="header">
-        <div className="header__title">Анализ композиционного центра</div>
-        <a href="/" className="header__home-button">Домой</a>
-      </header>
 
       <main className="order-page">
         <div className="order-container">
-          <div className="description-section">
+
+          {/* Описание + действия */}
+          <div className="description-row">
             <div className="description">
               <div className="description-header">Описание</div>
               <div className="description-text">
-                Добавьте описание задачи, чтобы не перепутать её с другими.
+                Добавьте описание задачи, чтобы не перепутать её с другими
               </div>
+
               <textarea
                 className="desc-form"
-                value={currentRequest.description || ''}
-                readOnly
+                value={currentRequest.description ?? ''}
+                onChange={(e) =>
+                  dispatch({
+                    type: 'request/setCurrentRequestField',
+                    payload: {
+                      field: 'description', 
+                      value: e.target.value,
+                    },
+                  })
+                }
+                onBlur={handleSaveDescription}
               />
             </div>
 
-            <div className="delete-container">
+            <div className="action-buttons">
               <button
-                className="delete-button"
-                onClick={handleDeleteRequest}
+                className="form-button"
+                onClick={handleFormRequest}
               >
-                <Trash size={16} style={{ marginRight: '6px' }} />
+                Сформировать заявку
+              </button>
+
+              <button
+                className="request-delete-button"
+                onClick={() =>
+                  requestId &&
+                  confirm('Удалить заявку? Это действие нельзя отменить.') &&
+                  dispatch(deleteRequest(requestId))
+                }
+              >
+                <Trash size={16} />
                 Удалить заявку
               </button>
             </div>
           </div>
 
+          {/* Эксперты */}
           <section className="basket-grid">
-            {expertsWithImages.length ? (
-              expertsWithImages.map((e) => (
-                <div key={e.id_artcenter} className="basket-card">
+            {expertLinks.map((link: ModelExpertsToRequest, index) => {
+              const expert =
+                link.id_artcenter != null
+                  ? expertsById[link.id_artcenter]
+                  : undefined;
+
+              return (
+                <div key={index} className="basket-card">
                   <div className="basket-card__image">
-                    <img src={e.img_url || '/ArtFront/images/imageError.gif'} alt={e.title} />
-                  </div>
-                  <div className="basket-card__info">
-                    <h3>{e.title}</h3>
-                    <p><strong>Эксперт:</strong> {e.name}</p>
-                    {e.center_x != null && e.center_y != null && (
-                      <p><strong>X:</strong> {e.center_x}, <strong>Y:</strong> {e.center_y}</p>
+                    {expert?.img_url ? (
+                      <img src={expert.img_url} alt="" />
+                    ) : (
+                      <div className="basket-card__placeholder">—</div>
                     )}
                   </div>
+
+                  <div className="basket-card__info">
+                    <div className="expert-algorithm">
+                      <span className="value">
+                        {expert?.algorithm ?? '—'}
+                      </span>
+                    </div>
+
+                    <div className="expert-coordinates">
+                      <div>
+                        <label>X</label>
+                        <input
+                          type="number"
+                          step="any"
+                          inputMode="decimal"
+                          value={link.centerX === null ? '' : link.centerX}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            dispatch({
+                              type: 'request/updateExpertLink',
+                              payload: {
+                                index,
+                                field: 'centerX',
+                                value: v === '' ? null : Number(v),
+                              },
+                            });
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label>Y</label>
+                        <input
+                          type="number"
+                          step="any"
+                          inputMode="decimal"
+                          value={link.centerY === null ? '' : link.centerY}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            dispatch({
+                              type: 'request/updateExpertLink',
+                              payload: {
+                                index,
+                                field: 'centerY',
+                                value: v === '' ? null : Number(v),
+                              },
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      className="basket-remove-btn"
+                      onClick={() =>
+                        link.id_artcenter &&
+                        dispatch(
+                          removeExpertFromRequest({
+                            requestId: requestId!,
+                            expertId: link.id_artcenter,
+                          })
+                        )
+                      }
+                    >
+                      <img
+                        src="/ArtFront/images/bin.png"
+                        alt="Удалить"
+                        style={{ width: '50px', height: '50px' }}
+                      />
+                    </button>
+
+                  </div>
                 </div>
-              ))
-            ) : (
-              <div className="empty-basket">
-                <p className="empty-basket__text">В этой заявке пока нет выбранных экспертов.</p>
-              </div>
-            )}
+              );
+            })}
           </section>
 
-          {currentRequest.factor_x != null && currentRequest.factor_y != null && (
-            <div className="global-result-card">
-              <h2>Результат анализа</h2>
-              <p><strong>X:</strong> {currentRequest.factor_x}</p>
-              <p><strong>Y:</strong> {currentRequest.factor_y}</p>
-            </div>
-          )}
         </div>
       </main>
     </div>

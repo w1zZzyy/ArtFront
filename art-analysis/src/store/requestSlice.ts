@@ -7,6 +7,8 @@ import type {
   HandlerDTORespCenterRequestExpertLink, 
   HandlerDTORespUpdate
 } from '../api/generated/api';
+import { getArtExpertById } from '../api/expertsApi';
+import type { IArtExpert } from '../types/types';
 
 // --- State ---
 interface RequestState {
@@ -17,6 +19,7 @@ interface RequestState {
   error: string | null;
   operationSuccess: boolean;
   addingExpert: number | null; // id эксперта, который добавляется
+  expertsById: Record<number, IArtExpert>;
 }
 
 const initialState: RequestState = {
@@ -27,6 +30,7 @@ const initialState: RequestState = {
   error: null,
   operationSuccess: false,
   addingExpert: null,
+  expertsById: {}
 };
 
 // --- Actions ---
@@ -69,14 +73,23 @@ export const fetchCurrentDraftRequest = createAsyncThunk(
 // Получить заявку по ID
 export const fetchRequestById = createAsyncThunk(
   'request/fetchById',
-  async (id: number, { rejectWithValue }) => {
-    try {
-      const res = await api.api.centerRequestDetail(id); // <--- только так
-      return res.data;
-    } catch (err: any) {
-      return rejectWithValue('Не удалось загрузить заявку');
-    }
+  async (id: number, { dispatch, rejectWithValue }) => {
+  try {
+    const res = await api.api.centerRequestDetail(id);
+    const request = res.data;
+
+    // ЗАГРУЖАЕМ ЭКСПЕРТОВ
+    request.experts?.forEach((link: any) => {
+      if (link.id_artcenter) {
+        dispatch(fetchExpertById(link.id_artcenter));
+      }
+    });
+
+    return request;
+  } catch {
+    return rejectWithValue('Не удалось загрузить заявку');
   }
+}
 );
 
 
@@ -128,8 +141,6 @@ export const deleteRequest = createAsyncThunk(
     }
   }
 );
-
-// --- Новые thunk-ы ---
 
 // Обновить описание заявки
 export const updateRequestDescription = createAsyncThunk<
@@ -208,6 +219,22 @@ export const resolveRequest = createAsyncThunk<
   }
 );
 
+export const fetchExpertById = createAsyncThunk<
+  IArtExpert,
+  number,
+  { rejectValue: string }
+>(
+  'request/fetchExpertById',
+  async (id, { rejectWithValue }) => {
+    try {
+      return await getArtExpertById(String(id));
+    } catch {
+      return rejectWithValue('Не удалось загрузить эксперта');
+    }
+  }
+);
+
+
 // --- Slice ---
 const requestSlice = createSlice({
   name: 'request',
@@ -221,6 +248,17 @@ const requestSlice = createSlice({
       state.currentDraftInfo = null;
       state.error = null;
       state.loading = false;
+    },
+    setCurrentRequestField: (
+      state,
+      action: { payload: { field: string; value: any } }
+    ) => {
+      if (state.currentRequest) {
+        const { field, value } = action.payload;
+        if (field in state.currentRequest) {
+          (state.currentRequest as any)[field] = value;
+        }
+      }
     },
   },
   extraReducers: (builder) => {
@@ -237,6 +275,9 @@ const requestSlice = createSlice({
       .addCase(fetchCurrentDraftInfo.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(fetchExpertById.fulfilled, (state, action) => {
+        state.expertsById[action.payload.id_artcenter] = action.payload;
       });
 
     // fetchCurrentDraftRequest
