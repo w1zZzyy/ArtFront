@@ -8,13 +8,19 @@ import { AppNavbar } from '../components/Navbar';
 import { fetchRequestsList } from '../store/requestSlice';
 import './styles/RequestsList.css';
 
-// Статусы заявок
+// Статусы заявок (как в swagger, но поддерживаем и русские варианты из бэкенда)
 const STATUS_DRAFT = 'draft';
 const STATUS_FORMED = 'formed';
 const STATUS_COMPLETED = 'completed';
 const STATUS_REJECTED = 'rejected';
 
 const getStatusBadge = (status: string | undefined) => {
+  // Мапим и английские, и русские статусы в бейджи
+  if (status === 'черновик') status = STATUS_DRAFT;
+  if (status === 'сформирован') status = STATUS_FORMED;
+  if (status === 'завершён') status = STATUS_COMPLETED;
+  if (status === 'отклонён') status = STATUS_REJECTED;
+
   switch (status) {
     case STATUS_DRAFT:
       return <Badge bg="secondary">Черновик</Badge>;

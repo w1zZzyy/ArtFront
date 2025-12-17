@@ -192,10 +192,17 @@ export const updateRequestDescription = createAsyncThunk<
   'request/updateDescription',
   async ({ id, description }, { rejectWithValue }) => {
     try {
+      const trimmed = (description ?? '').trim();
+      // Бэк требует непустое описание (binding:"required"),
+      // если строки нет — не шлём запрос вовсе.
+      if (!trimmed) {
+        return rejectWithValue('Описание не может быть пустым');
+      }
+
       const res = await api.api.centerRequestUpdate(id, {
         center_x: 0,
         center_y: 0,
-        request_description: description || '',
+        request_description: trimmed,
       });
       return res.data;
     } catch (err: any) {
@@ -475,7 +482,11 @@ const requestSlice = createSlice({
       })
       .addCase(updateRequestDescription.fulfilled, (state, action) => {
         state.loading = false;
-        state.currentRequest = action.payload;
+        // Бэк не всегда возвращает корректное описание,
+        // поэтому оставляем в состоянии локально отредактированное значение.
+        if (state.currentRequest) {
+          state.currentRequest.description = action.meta.arg.description;
+        }
       })
       .addCase(updateRequestDescription.rejected, (state, action) => {
         state.loading = false;

@@ -62,22 +62,39 @@ const RequestPage: React.FC = () => {
   console.log('RequestPage: expertLinks =', expertLinks);
 
   const handleSaveDescription = () => {
-    if (requestId) {
-      dispatch(
-        updateRequestDescription({
-          id: requestId,
-          description: currentRequest.description ?? '',
-        })
-      );
+    if (!requestId) return;
+
+    const desc = (currentRequest.description ?? '').trim();
+    if (!desc) {
+      // Не отправляем пустое описание на бэк, чтобы не ловить 400
+      return;
     }
+
+    dispatch(
+      updateRequestDescription({
+        id: requestId,
+        description: desc,
+      })
+    );
   };
 
   const handleFormRequest = () => {
-    if (requestId) {
-      if (confirm('Сформировать заявку? Это действие нельзя отменить.')) {
-        dispatch(formRequest(requestId));
-      }
+    if (!requestId) return;
+
+    if (!confirm('Сформировать заявку? Это действие нельзя отменить.')) {
+      return;
     }
+
+    dispatch(formRequest(requestId))
+      .unwrap()
+      .then(() => {
+        // После успешного оформления отправляем пользователя
+        // в список заявок, где он увидит заявку в статусе "Сформирована"
+        navigate('/requests');
+      })
+      .catch(() => {
+        // Ошибку уже обработает слайс через state.error
+      });
   };
 
   const handleSaveData = () => {
@@ -98,8 +115,15 @@ const RequestPage: React.FC = () => {
     }
   };
 
-  const isDraft = currentRequest.request_status === 'draft';
-  const isFormed = currentRequest.request_status === 'formed';
+  // Статус заявки может приходить как на английском (из swagger-генерации),
+  // так и на русском (как в модельках бэкенда). Поддерживаем оба варианта.
+  const status = currentRequest.request_status as string | undefined;
+  const isDraft =
+    status === 'draft' || status === 'черновик';
+  const isFormed =
+    status === 'formed' || status === 'сформирован';
+  const isCompleted =
+    status === 'completed' || status === 'завершён';
 
   console.log('RequestPage DEBUG:', {
     isModerator,
@@ -119,9 +143,17 @@ const RequestPage: React.FC = () => {
           {/* Описание + действия */}
           <div className="description-row">
             <div className="description">
-              <div className="description-header">Описание</div>
+              <div className="description-header">
+                <span className="description-title">Название расчёта</span>
+                <span className="description-status-pill">
+                  {isDraft && 'Черновик'}
+                  {isFormed && 'Сформирована'}
+                  {isCompleted && 'Завершена'}
+                  {!isDraft && !isFormed && !isCompleted && currentRequest.request_status}
+                </span>
+              </div>
               <div className="description-text">
-                Добавьте описание задачи, чтобы не перепутать её с другими
+                Укажите понятное название и короткое описание расчёта, чтобы позже было легко найти нужную задачу.
               </div>
 
               <textarea
@@ -141,33 +173,10 @@ const RequestPage: React.FC = () => {
             </div>
 
             <div className="action-buttons">
-              {/* Для пользователя в черновике: кнопка сохранить и сформировать */}
-              {!isModerator && isDraft && (
-                <>
-                  <button
-                    className="save-button"
-                    onClick={handleSaveData}
-                  >
-                    <img src="/ArtFront/images/save.png" alt="" style={{ width: '20px', height: '20px' }} />
-                    Сохранить данные
-                  </button>
-
-                  <button
-                    className="form-button"
-                    onClick={handleFormRequest}
-                  >
-                    Сформировать заявку
-                  </button>
-                </>
-              )}
-
               {/* Для модератора в сформированной заявке */}
               {isModerator && isFormed && (
                 <>
-                  <button
-                    className="save-button"
-                    onClick={handleSaveData}
-                  >
+                  <button className="save-button" onClick={handleSaveData}>
                     <img src="/ArtFront/images/save.png" alt="" style={{ width: '20px', height: '20px' }} />
                     Сохранить данные
                   </button>
@@ -181,18 +190,6 @@ const RequestPage: React.FC = () => {
                   </button>
                 </>
               )}
-
-              <button
-                className="request-delete-button"
-                onClick={() =>
-                  requestId &&
-                  confirm('Удалить заявку? Это действие нельзя отменить.') &&
-                  dispatch(deleteRequest(requestId))
-                }
-              >
-                <Trash size={16} />
-                Удалить заявку
-              </button>
             </div>
           </div>
 
@@ -221,48 +218,60 @@ const RequestPage: React.FC = () => {
                       </span>
                     </div>
 
-                    <div className="expert-coordinates">
-                      <div>
-                        <label>X</label>
-                        <input
-                          type="number"
-                          step="any"
-                          inputMode="decimal"
-                          value={link.center_x === null || link.center_x === undefined ? '' : link.center_x}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            console.log('X onChange: index =', index, ', value =', v);
-                            dispatch({
-                              type: 'request/updateExpertLink',
-                              payload: {
-                                index,
-                                field: 'center_x',
-                                value: v === '' ? null : Number(v),
-                              },
-                            });
-                          }}
-                        />
+                    <div className="expert-coordinates-with-actions">
+                      <div className="expert-coordinates">
+                        <div>
+                          <label>X</label>
+                          <input
+                            type="number"
+                            step="any"
+                            inputMode="decimal"
+                            value={link.center_x === null || link.center_x === undefined ? '' : link.center_x}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              console.log('X onChange: index =', index, ', value =', v);
+                              dispatch({
+                                type: 'request/updateExpertLink',
+                                payload: {
+                                  index,
+                                  field: 'center_x',
+                                  value: v === '' ? null : Number(v),
+                                },
+                              });
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label>Y</label>
+                          <input
+                            type="number"
+                            step="any"
+                            inputMode="decimal"
+                            value={link.center_y === null || link.center_y === undefined ? '' : link.center_y}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              dispatch({
+                                type: 'request/updateExpertLink',
+                                payload: {
+                                  index,
+                                  field: 'center_y',
+                                  value: v === '' ? null : Number(v),
+                                },
+                              });
+                            }}
+                          />
+                        </div>
                       </div>
 
-                      <div>
-                        <label>Y</label>
-                        <input
-                          type="number"
-                          step="any"
-                          inputMode="decimal"
-                          value={link.center_y === null || link.center_y === undefined ? '' : link.center_y}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            dispatch({
-                              type: 'request/updateExpertLink',
-                              payload: {
-                                index,
-                                field: 'center_y',
-                                value: v === '' ? null : Number(v),
-                              },
-                            });
-                          }}
-                        />
+                      <div className="expert-actions">
+                        <button
+                          className="expert-save-btn"
+                          onClick={() => handleSaveData()}
+                          disabled={!isDraft && !isModerator}
+                        >
+                          Сохранить координаты
+                        </button>
                       </div>
                     </div>
 
@@ -291,8 +300,33 @@ const RequestPage: React.FC = () => {
             })}
           </section>
 
+          {/* Нижняя панель действий */}
+          <div className="request-footer">
+            {isDraft && (
+              <button
+                className="form-button"
+                onClick={handleFormRequest}
+                disabled={expertLinks.length === 0}
+              >
+                Оформить заявку
+              </button>
+            )}
+
+            <button
+              className="request-delete-button"
+              onClick={() =>
+                requestId &&
+                confirm('Удалить заявку? Это действие нельзя отменить.') &&
+                dispatch(deleteRequest(requestId))
+              }
+            >
+              <Trash size={16} />
+              Удалить заявку
+            </button>
+          </div>
+
           {/* Модальное окно с результатом */}
-          {showResultModal && currentRequest.request_status === 'completed' && (
+          {showResultModal && isCompleted && (
             <div className="result-modal-overlay" onClick={() => setShowResultModal(false)}>
               <div className="result-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="result-modal-header">

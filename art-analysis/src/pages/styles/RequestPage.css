@@ -36,11 +36,29 @@
 }
 
 .description-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.description-title {
     font-family: 'Segoe UI', Arial, sans-serif;
-    font-size: 1.4rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
     color: #2c3e50;
-    font-weight: bold;
+    font-weight: 600;
+}
+
+.description-status-pill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    background: #e9f5ff;
+    color: #0062FF;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .description-text {
@@ -167,6 +185,12 @@
     transform: translateY(-1px);
 }
 
+.request-footer {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
 /* ===== КАРТОЧКИ ЭКСПЕРТОВ ===== */
 
 .basket-grid {
@@ -224,9 +248,17 @@
 
 /* Координаты */
 
+.expert-coordinates-with-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
 .expert-coordinates {
     display: flex;
     gap: 1.2rem;
+    flex-wrap: wrap;
 }
 
 .expert-coordinates label {
@@ -245,6 +277,49 @@
     color: #2c3e50;
     font-weight: 500;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.expert-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+.expert-save-btn,
+.expert-form-btn {
+    border-radius: 6px;
+    border: none;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+    white-space: nowrap;
+}
+
+.expert-save-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.expert-save-btn:hover:not(:disabled) {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.expert-save-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.expert-form-btn {
+    background-color: #0062FF;
+    color: #fff;
+}
+
+.expert-form-btn:hover {
+    background-color: #0052D6;
+    transform: translateY(-1px);
 }
 
 .expert-coordinates input:focus {
