@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Trash } from 'react-bootstrap-icons';
 import './styles/RequestPage.css';
@@ -7,6 +7,7 @@ import { AppNavbar } from '../components/Navbar';
 
 import {
   fetchCurrentDraftRequest,
+  fetchRequestById,
   updateRequestDescription,
   deleteRequest,
   removeExpertFromRequest,
@@ -32,28 +33,18 @@ const RequestPage: React.FC = () => {
     expertsById,
   } = useSelector((state: RootState) => state.request);
 
+  const storedUser = localStorage.getItem('userInfo');
+  const userObj = storedUser ? JSON.parse(storedUser) : null;
+  const isModerator = userObj?.is_admin || false;
+
   useEffect(() => {
-    // Проверяем, является ли пользователь модератором
-    const storedUser = localStorage.getItem('userInfo');
-    const userObj = storedUser ? JSON.parse(storedUser) : null;
-    
-    // Если модератор, перенаправляем на список заявок
-    if (userObj?.is_admin) {
-      navigate('/requests');
-      return;
-    }
-    
     dispatch(fetchCurrentDraftRequest());
 
     return () => {
       dispatch(clearCurrentRequest());
       dispatch(resetOperationSuccess());
     };
-  }, [dispatch, navigate]);
-
-  useEffect(() => {
-    if (operationSuccess) navigate('/');
-  }, [operationSuccess, navigate]);
+  }, [dispatch]);
 
   if (loading || !currentRequest) {
     return (
@@ -110,6 +101,14 @@ const RequestPage: React.FC = () => {
   const isDraft = currentRequest.request_status === 'draft';
   const isFormed = currentRequest.request_status === 'formed';
 
+  console.log('RequestPage DEBUG:', {
+    isModerator,
+    isDraft,
+    isFormed,
+    request_status: currentRequest.request_status,
+    userObj,
+  });
+
   return (
     <div className="request-body">
       <AppNavbar />
@@ -142,7 +141,8 @@ const RequestPage: React.FC = () => {
             </div>
 
             <div className="action-buttons">
-              {isDraft && (
+              {/* Для пользователя в черновике: кнопка сохранить и сформировать */}
+              {!isModerator && isDraft && (
                 <>
                   <button
                     className="save-button"
@@ -161,14 +161,25 @@ const RequestPage: React.FC = () => {
                 </>
               )}
 
-              {isFormed && (
-                <button
-                  className="resolve-button"
-                  onClick={handleCompleteRequest}
-                >
-                  <img src="/ArtFront/images/resolve.png" alt="" style={{ width: '20px', height: '20px' }} />
-                  Завершить обработку
-                </button>
+              {/* Для модератора в сформированной заявке */}
+              {isModerator && isFormed && (
+                <>
+                  <button
+                    className="save-button"
+                    onClick={handleSaveData}
+                  >
+                    <img src="/ArtFront/images/save.png" alt="" style={{ width: '20px', height: '20px' }} />
+                    Сохранить данные
+                  </button>
+
+                  <button
+                    className="resolve-button"
+                    onClick={handleCompleteRequest}
+                  >
+                    <img src="/ArtFront/images/resolve.png" alt="" style={{ width: '20px', height: '20px' }} />
+                    Завершить обработку
+                  </button>
+                </>
               )}
 
               <button

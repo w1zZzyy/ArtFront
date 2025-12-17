@@ -195,7 +195,7 @@ export const updateRequestDescription = createAsyncThunk<
       const res = await api.api.centerRequestUpdate(id, {
         center_x: 0,
         center_y: 0,
-        request_description: description,
+        request_description: description || '',
       });
       return res.data;
     } catch (err: any) {
@@ -216,7 +216,7 @@ export const updateRequestCenter = createAsyncThunk<
       const res = await api.api.centerRequestExpertsUpdate(id, expertId, {
         center_x: centerX,
         center_y: centerY,
-        request_description: description ?? '',
+        request_description: description || 'Описание заявки',
       });
       return res.data;
     } catch (err: any) {
@@ -300,7 +300,7 @@ export const saveExpertsCoordinates = createAsyncThunk<
               expertId: expert.id_artcenter,
               centerX: expert.center_x ?? 0,
               centerY: expert.center_y ?? 0,
-              description: request.description ?? '',
+              description: request.description || 'Описание заявки',
             })
           ).unwrap();
         }
@@ -476,7 +476,6 @@ const requestSlice = createSlice({
       .addCase(updateRequestDescription.fulfilled, (state, action) => {
         state.loading = false;
         state.currentRequest = action.payload;
-        state.operationSuccess = true;
       })
       .addCase(updateRequestDescription.rejected, (state, action) => {
         state.loading = false;
@@ -506,13 +505,13 @@ const requestSlice = createSlice({
       })
       .addCase(removeExpertFromRequest.fulfilled, (state) => {
         state.loading = false;
-        state.operationSuccess = true;
       })
       .addCase(removeExpertFromRequest.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
 
+    // resolveRequest
     // resolveRequest
     builder
       .addCase(resolveRequest.pending, (state) => {
@@ -522,13 +521,11 @@ const requestSlice = createSlice({
       .addCase(resolveRequest.fulfilled, (state, action) => {
         state.loading = false;
         state.currentRequest = action.payload;
-        state.operationSuccess = true;
       })
       .addCase(resolveRequest.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
-
     // setAddingExpert
     builder.addCase(setAddingExpert, (state, action) => {
       state.addingExpert = action.payload;
