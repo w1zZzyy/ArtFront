@@ -10,6 +10,7 @@
     flex: 1;
     width: 100vw;
     min-height: 100vh;
+    padding-top: 70px;
 }
 
 .home-page-container {
@@ -196,6 +197,10 @@
 
 /* Планшеты вертикально (600px - 768px) */
 @media (max-width: 768px) {
+    .home-page-body {
+        padding-top: 65px;
+    }
+
     .home-page-container {
         padding: 15px 15px 30px 15px;
         gap: 20px;
@@ -233,11 +238,11 @@
 /* Мобильные устройства (420px - 600px) */
 @media (max-width: 600px) {
     .home-page-body {
-        padding-top: 60px;
+        padding-top: 65px;
     }
 
     .home-page-container {
-        padding: 15px 15px 30px 15px;
+        padding: 10px 10px 25px 10px;
         gap: 20px;
     }
 
@@ -287,12 +292,17 @@
 
 /* Маленькие смартфоны (до 420px) */
 @media (max-width: 420px) {
+    .home-page-body {
+        padding-top: 60px;
+    }
+
     .home-page-container {
         padding: 10px 10px 20px 10px;
     }
 
     .home-page-content h1 {
-        font-size: 1.35rem;
+        font-size: 1.3rem;
+        line-height: 1.2;
     }
 
     .home-page-lead {

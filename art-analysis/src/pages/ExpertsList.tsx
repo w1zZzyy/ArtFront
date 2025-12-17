@@ -91,8 +91,8 @@ export const ExpertsList = () => {
 
   return (
     <div className="experts-body">
-      <Container fluid className="pt-4">
-        <AppNavbar />
+      <AppNavbar />
+      <Container fluid className="px-3 px-md-4 pt-3 pt-md-4">
         <div>
           <h1 className="experts-s-t">Выберите эксперта</h1>
         </div>
@@ -120,12 +120,20 @@ export const ExpertsList = () => {
 
                 <div className="cart-wrapper">
                   {draftTask?.experts_count && draftTask.experts_count > 0 ? (
-                    <Link to={`/request/${draftTask.id_request}`} className="d-flex align-items-center">
+                    <Link to={`/request/${draftTask.id_request}`} className="d-flex align-items-center position-relative">
                       <Image
                         src="/ArtFront/images/cart.png"
                         alt="Корзина"
+                        className="d-none d-md-block"
                         width={60}
                         height={60}
+                      />
+                      <Image
+                        src="/ArtFront/images/cart.png"
+                        alt="Корзина"
+                        className="d-md-none"
+                        width={45}
+                        height={45}
                       />
                       <Badge pill bg="secondary" className="cart-indicator">
                         {draftTask.experts_count}
@@ -136,8 +144,17 @@ export const ExpertsList = () => {
                       <Image
                         src="/ArtFront/images/cart.png"
                         alt="Корзина"
+                        className="d-none d-md-block"
                         width={60}
                         height={60}
+                        style={{ opacity: 0.5 }}
+                      />
+                      <Image
+                        src="/ArtFront/images/cart.png"
+                        alt="Корзина"
+                        className="d-md-none"
+                        width={45}
+                        height={45}
                         style={{ opacity: 0.5 }}
                       />
                     </span>
@@ -157,9 +174,9 @@ export const ExpertsList = () => {
         ) : (
           <Row className="experts-templ">
             <Col xs={12}>
-              <Row xs={1} md={2} lg={3} xxl={3} className="g-4">
+              <Row className="g-4">
                 {filteredExperts.map(expert => (
-                  <Col key={expert.id_artcenter}>
+                  <Col key={expert.id_artcenter} xs={12} sm={12} md={6} lg={4} xl={4} xxl={4}>
                     <ExpertCard expert={expert} showExtra={false}/>
                   </Col>
                 ))}
