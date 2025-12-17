@@ -172,7 +172,7 @@
 
 /* ===================== Адаптивность ===================== */
 
-/* Большие планшеты и маленькие десктопы (1024px - 1200px) */
+/* Большие планшеты и маленькие десктопы (992px - 1200px) */
 @media (max-width: 1200px) {
     .expert-card {
         min-height: 300px;
@@ -192,7 +192,6 @@
 @media (max-width: 1024px) {
     .expert-card {
         min-height: auto;
-        flex-direction: column;
     }
 
     .expert-crd-img {
@@ -212,13 +211,18 @@
         gap: 0.5rem;
         padding: 0 1rem 1.25rem 1rem;
     }
+
+    .expert-btn-add,
+    .expert-btn-more {
+        flex: 1;
+    }
 }
 
-/* Планшеты вертикально (600px - 768px) */
+/* Планшеты вертикально и мобильные (до 768px) */
 @media (max-width: 768px) {
     .expert-card {
         border-radius: 8px;
-        padding: 0;
+        max-width: 100%;
     }
 
     .expert-crd-img {
@@ -253,6 +257,7 @@
     .expert-btn-add,
     .expert-btn-more {
         width: 100%;
+        flex: none;
         padding: 0.6rem 0;
         font-size: 0.9rem;
     }
@@ -271,10 +276,9 @@
     }
 }
 
-/* Мобильные устройства (420px - 600px) */
+/* Мобильные устройства (до 600px) */
 @media (max-width: 600px) {
     .expert-card {
-        width: 100%;
         border-radius: 8px;
         box-shadow: 0 3px 5px rgba(0,0,0,0.1);
     }
@@ -309,8 +313,6 @@
 
     .expert-btn-add,
     .expert-btn-more {
-        flex: none;
-        width: 100%;
         padding: 0.55rem 0;
         font-size: 0.875rem;
     }
@@ -335,11 +337,11 @@
     }
 
     .expert-crd-img {
-        height: 160px;
+        height: 170px;
     }
 
     .expert-crd-img img {
-        height: 160px;
+        height: 170px;
     }
 
     .expert-crd-txt {

@@ -45,3 +45,82 @@
     color: #bdc1c6; /* светло-серый Google */
 }
 
+/* ===================== Адаптивность ===================== */
+
+/* Планшеты (768px - 992px) */
+@media (max-width: 992px) {
+    .modern-breadcrumbs {
+        padding: 0.45rem 0;
+    }
+}
+
+/* Планшеты вертикально (600px - 768px) */
+@media (max-width: 768px) {
+    .modern-breadcrumbs {
+        padding: 0.4rem 0;
+        flex-wrap: wrap;
+    }
+
+    .breadcrumb-link {
+        font-size: 0.875rem;
+    }
+
+    .breadcrumb-active {
+        font-size: 0.875rem;
+    }
+
+    .breadcrumb-separator {
+        margin: 0 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Мобильные устройства (420px - 600px) */
+@media (max-width: 600px) {
+    .modern-breadcrumbs {
+        padding: 0.35rem 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .modern-breadcrumbs::-webkit-scrollbar {
+        display: none; /* Chrome, Safari */
+    }
+
+    .breadcrumb-link {
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .breadcrumb-active {
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+
+    .breadcrumb-separator {
+        margin: 0 0.4rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Маленькие смартфоны (до 420px) */
+@media (max-width: 420px) {
+    .modern-breadcrumbs {
+        padding: 0.3rem 0;
+    }
+
+    .breadcrumb-link {
+        font-size: 0.75rem;
+    }
+
+    .breadcrumb-active {
+        font-size: 0.75rem;
+    }
+
+    .breadcrumb-separator {
+        margin: 0 0.3rem;
+        font-size: 0.7rem;
+    }
+}
+
