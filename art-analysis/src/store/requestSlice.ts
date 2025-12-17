@@ -41,7 +41,7 @@ export const setAddingExpert = createAction<number | null>('request/setAddingExp
 // Получить список всех заявок
 export const fetchRequestsList = createAsyncThunk<
   HandlerDTORespCenterRequest[],
-  { status?: string; from?: string; to?: string } | undefined,
+  { status?: string; from?: string; to?: string; isModerator?: boolean; userId?: number } | undefined,
   { rejectValue: string }
 >(
   'request/fetchList',
@@ -62,7 +62,16 @@ export const fetchRequestsList = createAsyncThunk<
       const res = await api.api.centerRequestList(query);
       console.log('fetchRequestsList: response =', res.data);
       console.log('fetchRequestsList: full response =', res);
-      return res.data;
+      
+      let filteredData = res.data;
+      
+      // Фильтрация для модератора: показываем только заявки, где он модератор
+      if (filters.isModerator && filters.userId) {
+        filteredData = res.data.filter(request => request.id_moderator === filters.userId);
+        console.log('fetchRequestsList: filtered for moderator =', filteredData);
+      }
+      
+      return filteredData;
     } catch (err: any) {
       console.error('fetchRequestsList: error =', err);
       return rejectWithValue('Не удалось загрузить список заявок');
@@ -266,6 +275,47 @@ export const fetchExpertById = createAsyncThunk<
   }
 );
 
+// Сохранить все координаты экспертов
+export const saveExpertsCoordinates = createAsyncThunk<
+  void,
+  void,
+  { rejectValue: string; state: { request: RequestState } }
+>(
+  'request/saveExpertsCoordinates',
+  async (_, { getState, dispatch, rejectWithValue }) => {
+    try {
+      const state = getState();
+      const request = state.request.currentRequest;
+      
+      if (!request || !request.id_request || !request.experts) {
+        return rejectWithValue('Нет активной заявки');
+      }
+
+      // Сохраняем координаты для каждого эксперта
+      const promises = request.experts.map((expert) => {
+        if (expert.id_artcenter && expert.id_request) {
+          return dispatch(
+            updateRequestCenter({
+              id: expert.id_request,
+              expertId: expert.id_artcenter,
+              centerX: expert.center_x ?? 0,
+              centerY: expert.center_y ?? 0,
+              description: request.description ?? '',
+            })
+          ).unwrap();
+        }
+        return Promise.resolve();
+      });
+
+      await Promise.all(promises);
+      
+      // Перезагружаем заявку после сохранения
+      await dispatch(fetchRequestById(request.id_request)).unwrap();
+    } catch (err: any) {
+      return rejectWithValue('Не удалось сохранить данные');
+    }
+  }
+);
 
 // --- Slice ---
 const requestSlice = createSlice({
@@ -289,6 +339,20 @@ const requestSlice = createSlice({
         const { field, value } = action.payload;
         if (field in state.currentRequest) {
           (state.currentRequest as any)[field] = value;
+        }
+      }
+    },
+    updateExpertLink: (
+      state,
+      action: { payload: { index: number; field: string; value: any } }
+    ) => {
+      if (state.currentRequest && state.currentRequest.experts) {
+        const { index, field, value } = action.payload;
+        if (index >= 0 && index < state.currentRequest.experts.length) {
+          const expert = state.currentRequest.experts[index];
+          if (field in expert) {
+            (expert as any)[field] = value;
+          }
         }
       }
     },
@@ -469,6 +533,21 @@ const requestSlice = createSlice({
     builder.addCase(setAddingExpert, (state, action) => {
       state.addingExpert = action.payload;
     });
+
+    // saveExpertsCoordinates
+    builder
+      .addCase(saveExpertsCoordinates.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(saveExpertsCoordinates.fulfilled, (state) => {
+        state.loading = false;
+        state.operationSuccess = true;
+      })
+      .addCase(saveExpertsCoordinates.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
   },
 });
 

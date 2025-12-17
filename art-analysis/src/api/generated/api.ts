@@ -69,6 +69,8 @@ export interface HandlerDTORespCenterRequest {
   id_request?: number;
   /** @example 1 */
   id_user?: number;
+  /** @example 2 */
+  id_moderator?: number;
   /** @example "formed" */
   request_status?: "draft" | "formed" | "completed" | "rejected";
 }

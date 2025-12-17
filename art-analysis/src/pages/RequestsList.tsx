@@ -33,7 +33,7 @@ export const RequestsList = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const { isAuth } = useSelector((state: RootState) => state.auth);
+  const { isAuth, user } = useSelector((state: RootState) => state.auth);
   const { list, loading } = useSelector((state: RootState) => state.request);
 
   // Фильтры
@@ -56,6 +56,16 @@ export const RequestsList = () => {
       if (filters.from) apiFilters.from = filters.from;
       if (filters.to) apiFilters.to = filters.to;
       
+      // Получаем полный объект user из localStorage для is_admin
+      const storedUser = localStorage.getItem('userInfo');
+      const userObj = storedUser ? JSON.parse(storedUser) : null;
+      
+      // Для модераторов (is_admin = true) фильтруем по id_moderator
+      if (userObj?.is_admin && userObj?.id_user) {
+        apiFilters.isModerator = true;
+        apiFilters.userId = userObj.id_user;
+      }
+      
       dispatch(fetchRequestsList(apiFilters));
     };
 
@@ -77,7 +87,11 @@ export const RequestsList = () => {
       <AppNavbar />
       <Container fluid className="requests-list-container pt-5 mt-5 px-4">
         <h2 className="fw-bold mb-4 text-center requests-list-title">
-          История заявок на анализ
+          {(() => {
+            const storedUser = localStorage.getItem('userInfo');
+            const userObj = storedUser ? JSON.parse(storedUser) : null;
+            return userObj?.is_admin ? 'Мои заявки (Модератор)' : 'История заявок на анализ';
+          })()}
         </h2>
 
         <Row>
@@ -178,7 +192,7 @@ export const RequestsList = () => {
                               : '-'}
                           </td>
                           <td className="small">
-                            {request.date_formed
+                            {request.date_formed && new Date(request.date_formed).getFullYear() > 1900
                               ? new Date(request.date_formed).toLocaleDateString('ru-RU')
                               : '-'}
                           </td>

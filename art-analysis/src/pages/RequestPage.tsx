@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Trash } from 'react-bootstrap-icons';
@@ -13,14 +13,17 @@ import {
   formRequest,
   resetOperationSuccess,
   clearCurrentRequest,
+  saveExpertsCoordinates,
+  resolveRequest,
 } from '../store/requestSlice';
 
 import type { AppDispatch, RootState } from '../store';
-import type { ModelExpertsToRequest } from '../api/generated/api';
+import type { HandlerDTORespCenterRequestExpert } from '../api/generated/api';
 
 const RequestPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const [showResultModal, setShowResultModal] = useState(false);
 
   const {
     currentRequest,
@@ -30,13 +33,23 @@ const RequestPage: React.FC = () => {
   } = useSelector((state: RootState) => state.request);
 
   useEffect(() => {
+    // Проверяем, является ли пользователь модератором
+    const storedUser = localStorage.getItem('userInfo');
+    const userObj = storedUser ? JSON.parse(storedUser) : null;
+    
+    // Если модератор, перенаправляем на список заявок
+    if (userObj?.is_admin) {
+      navigate('/requests');
+      return;
+    }
+    
     dispatch(fetchCurrentDraftRequest());
 
     return () => {
       dispatch(clearCurrentRequest());
       dispatch(resetOperationSuccess());
     };
-  }, [dispatch]);
+  }, [dispatch, navigate]);
 
   useEffect(() => {
     if (operationSuccess) navigate('/');
@@ -53,6 +66,9 @@ const RequestPage: React.FC = () => {
 
   const requestId = currentRequest.id_request;
   const expertLinks = currentRequest.experts ?? [];
+
+  console.log('RequestPage: currentRequest =', currentRequest);
+  console.log('RequestPage: expertLinks =', expertLinks);
 
   const handleSaveDescription = () => {
     if (requestId) {
@@ -72,6 +88,27 @@ const RequestPage: React.FC = () => {
       }
     }
   };
+
+  const handleSaveData = () => {
+    if (requestId) {
+      dispatch(saveExpertsCoordinates());
+    }
+  };
+
+  const handleCompleteRequest = () => {
+    if (requestId) {
+      if (confirm('Завершить обработку заявки?')) {
+        dispatch(resolveRequest({ id: requestId, action: 'complete' }))
+          .unwrap()
+          .then(() => {
+            setShowResultModal(true);
+          });
+      }
+    }
+  };
+
+  const isDraft = currentRequest.request_status === 'draft';
+  const isFormed = currentRequest.request_status === 'formed';
 
   return (
     <div className="request-body">
@@ -105,12 +142,34 @@ const RequestPage: React.FC = () => {
             </div>
 
             <div className="action-buttons">
-              <button
-                className="form-button"
-                onClick={handleFormRequest}
-              >
-                Сформировать заявку
-              </button>
+              {isDraft && (
+                <>
+                  <button
+                    className="save-button"
+                    onClick={handleSaveData}
+                  >
+                    <img src="/ArtFront/images/save.png" alt="" style={{ width: '20px', height: '20px' }} />
+                    Сохранить данные
+                  </button>
+
+                  <button
+                    className="form-button"
+                    onClick={handleFormRequest}
+                  >
+                    Сформировать заявку
+                  </button>
+                </>
+              )}
+
+              {isFormed && (
+                <button
+                  className="resolve-button"
+                  onClick={handleCompleteRequest}
+                >
+                  <img src="/ArtFront/images/resolve.png" alt="" style={{ width: '20px', height: '20px' }} />
+                  Завершить обработку
+                </button>
+              )}
 
               <button
                 className="request-delete-button"
@@ -128,7 +187,7 @@ const RequestPage: React.FC = () => {
 
           {/* Эксперты */}
           <section className="basket-grid">
-            {expertLinks.map((link: ModelExpertsToRequest, index) => {
+            {expertLinks.map((link: HandlerDTORespCenterRequestExpert, index) => {
               const expert =
                 link.id_artcenter != null
                   ? expertsById[link.id_artcenter]
@@ -158,14 +217,15 @@ const RequestPage: React.FC = () => {
                           type="number"
                           step="any"
                           inputMode="decimal"
-                          value={link.centerX === null ? '' : link.centerX}
+                          value={link.center_x === null || link.center_x === undefined ? '' : link.center_x}
                           onChange={(e) => {
                             const v = e.target.value;
+                            console.log('X onChange: index =', index, ', value =', v);
                             dispatch({
                               type: 'request/updateExpertLink',
                               payload: {
                                 index,
-                                field: 'centerX',
+                                field: 'center_x',
                                 value: v === '' ? null : Number(v),
                               },
                             });
@@ -179,14 +239,14 @@ const RequestPage: React.FC = () => {
                           type="number"
                           step="any"
                           inputMode="decimal"
-                          value={link.centerY === null ? '' : link.centerY}
+                          value={link.center_y === null || link.center_y === undefined ? '' : link.center_y}
                           onChange={(e) => {
                             const v = e.target.value;
                             dispatch({
                               type: 'request/updateExpertLink',
                               payload: {
                                 index,
-                                field: 'centerY',
+                                field: 'center_y',
                                 value: v === '' ? null : Number(v),
                               },
                             });
@@ -219,6 +279,70 @@ const RequestPage: React.FC = () => {
               );
             })}
           </section>
+
+          {/* Модальное окно с результатом */}
+          {showResultModal && currentRequest.request_status === 'completed' && (
+            <div className="result-modal-overlay" onClick={() => setShowResultModal(false)}>
+              <div className="result-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="result-modal-header">
+                  <h2>Результаты анализа</h2>
+                  <button className="modal-close-btn" onClick={() => setShowResultModal(false)}>
+                    ×
+                  </button>
+                </div>
+
+                <div className="result-modal-content">
+                  <div className="result-section">
+                    <h3>Композиционный центр</h3>
+                    <div className="result-coordinates">
+                      <div className="result-coord">
+                        <span className="coord-label">X:</span>
+                        <span className="coord-value">{currentRequest.factor_x?.toFixed(2) ?? '—'}</span>
+                      </div>
+                      <div className="result-coord">
+                        <span className="coord-label">Y:</span>
+                        <span className="coord-value">{currentRequest.factor_y?.toFixed(2) ?? '—'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="result-section">
+                    <h3>Данные экспертов</h3>
+                    <div className="result-experts-list">
+                      {expertLinks.map((link, index) => {
+                        const expert = link.id_artcenter != null ? expertsById[link.id_artcenter] : undefined;
+                        return (
+                          <div key={index} className="result-expert-item">
+                            <div className="result-expert-name">{expert?.title ?? '—'}</div>
+                            <div className="result-expert-coords">
+                              X: {link.center_x?.toFixed(2) ?? '—'}, 
+                              Y: {link.center_y?.toFixed(2) ?? '—'}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="result-section">
+                    <h3>Информация о заявке</h3>
+                    <div className="result-info">
+                      <p><strong>Создана:</strong> {currentRequest.date_created ? new Date(currentRequest.date_created).toLocaleString('ru-RU') : '—'}</p>
+                      <p><strong>Сформирована:</strong> {currentRequest.date_formed ? new Date(currentRequest.date_formed).toLocaleString('ru-RU') : '—'}</p>
+                      <p><strong>Завершена:</strong> {currentRequest.date_conclusion ? new Date(currentRequest.date_conclusion).toLocaleString('ru-RU') : '—'}</p>
+                      <p><strong>Описание:</strong> {currentRequest.description || 'Нет описания'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="result-modal-footer">
+                  <button className="modal-ok-btn" onClick={() => setShowResultModal(false)}>
+                    Закрыть
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
       </main>
