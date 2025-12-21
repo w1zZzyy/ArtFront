@@ -1,11 +1,11 @@
-import { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Container, Table, Form, Row, Col, Badge, Spinner, Card, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Funnel, Calendar } from 'react-bootstrap-icons';
 import type { AppDispatch, RootState } from '../store';
 import { AppNavbar } from '../components/Navbar';
-import { fetchRequestsList } from '../store/requestSlice';
+import { fetchRequestsList, resolveRequest } from '../store/requestSlice';
 import './styles/RequestsList.css';
 
 // Статусы заявок (как в swagger, но поддерживаем и русские варианты из бэкенда)
@@ -42,12 +42,28 @@ export const RequestsList = () => {
   const { isAuth, user } = useSelector((state: RootState) => state.auth);
   const { list, loading } = useSelector((state: RootState) => state.request);
 
+  const storedUser = typeof window !== 'undefined' ? localStorage.getItem('userInfo') : null;
+  const userObj = storedUser ? JSON.parse(storedUser) : null;
+  const isModerator = !!userObj?.is_admin;
+
+  const isFormedStatus = (status: string | undefined) => {
+    return status === STATUS_FORMED || status === 'сформирован';
+  };
+
   // Фильтры
   const [filters, setFilters] = useState({
     status: 'all',
     from: '',
     to: '',
   });
+
+  const buildApiFilters = () => {
+    const apiFilters: any = {};
+    if (filters.status !== 'all') apiFilters.status = filters.status;
+    if (filters.from) apiFilters.from = filters.from;
+    if (filters.to) apiFilters.to = filters.to;
+    return apiFilters;
+  };
 
   // Загрузка списка заявок
   useEffect(() => {
@@ -57,22 +73,7 @@ export const RequestsList = () => {
     }
 
     const loadRequests = () => {
-      const apiFilters: any = {};
-      if (filters.status !== 'all') apiFilters.status = filters.status;
-      if (filters.from) apiFilters.from = filters.from;
-      if (filters.to) apiFilters.to = filters.to;
-      
-      // Получаем полный объект user из localStorage для is_admin
-      const storedUser = localStorage.getItem('userInfo');
-      const userObj = storedUser ? JSON.parse(storedUser) : null;
-      
-      // Для модераторов (is_admin = true) фильтруем по id_moderator
-      if (userObj?.is_admin && userObj?.id_user) {
-        apiFilters.isModerator = true;
-        apiFilters.userId = userObj.id_user;
-      }
-      
-      dispatch(fetchRequestsList(apiFilters));
+      dispatch(fetchRequestsList(buildApiFilters()));
     };
 
     loadRequests();
@@ -93,11 +94,7 @@ export const RequestsList = () => {
       <AppNavbar />
       <Container fluid className="requests-list-container pt-5 mt-5 px-4">
         <h2 className="fw-bold mb-4 text-center requests-list-title">
-          {(() => {
-            const storedUser = localStorage.getItem('userInfo');
-            const userObj = storedUser ? JSON.parse(storedUser) : null;
-            return userObj?.is_admin ? 'Мои заявки (Модератор)' : 'История заявок на анализ';
-          })()}
+          {isModerator ? 'Заявки пользователей (модератор)' : 'История заявок на анализ'}
         </h2>
 
         <Row>
@@ -177,6 +174,7 @@ export const RequestsList = () => {
                       <th>Дата создания</th>
                       <th>Дата формирования</th>
                       <th>Результат (X / Y)</th>
+                      {isModerator && <th>Действия</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -211,6 +209,58 @@ export const RequestsList = () => {
                               <span className="text-muted small">--</span>
                             )}
                           </td>
+                          {isModerator && (
+                            <td>
+                              {isFormedStatus(request.request_status) ? (
+                                <div className="d-flex gap-2">
+                                  <Button
+                                    variant="success"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (!request.id_request) return;
+                                      if (!confirm('Подтвердить заявку и завершить обработку?')) return;
+                                      dispatch(
+                                        resolveRequest({ id: request.id_request, action: 'complete' })
+                                      )
+                                        .unwrap()
+                                        .then(() => {
+                                          dispatch(fetchRequestsList(buildApiFilters()));
+                                        })
+                                        .catch(() => {
+                                          alert('Не удалось подтвердить заявку');
+                                        });
+                                    }}
+                                  >
+                                    Подтвердить
+                                  </Button>
+                                  <Button
+                                    variant="outline-danger"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      if (!request.id_request) return;
+                                      if (!confirm('Отклонить заявку?')) return;
+                                      dispatch(
+                                        resolveRequest({ id: request.id_request, action: 'reject' })
+                                      )
+                                        .unwrap()
+                                        .then(() => {
+                                          dispatch(fetchRequestsList(buildApiFilters()));
+                                        })
+                                        .catch(() => {
+                                          alert('Не удалось отклонить заявку');
+                                        });
+                                    }}
+                                  >
+                                    Отклонить
+                                  </Button>
+                                </div>
+                              ) : (
+                                <span className="text-muted small">—</span>
+                              )}
+                            </td>
+                          )}
                         </tr>
                       ))
                     ) : (

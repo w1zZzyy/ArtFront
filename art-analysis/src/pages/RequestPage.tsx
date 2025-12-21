@@ -23,6 +23,7 @@ import type { HandlerDTORespCenterRequestExpert } from '../api/generated/api';
 
 const RequestPage: React.FC = () => {
   const navigate = useNavigate();
+  const { id: routeId } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const [showResultModal, setShowResultModal] = useState(false);
 
@@ -38,13 +39,22 @@ const RequestPage: React.FC = () => {
   const isModerator = userObj?.is_admin || false;
 
   useEffect(() => {
-    dispatch(fetchCurrentDraftRequest());
+    if (routeId) {
+      // Открываем конкретную заявку (для истории и модератора)
+      const numericId = Number(routeId);
+      if (!Number.isNaN(numericId)) {
+        dispatch(fetchRequestById(numericId));
+      }
+    } else {
+      // Для пользователя без ID — работаем с его текущим черновиком
+      dispatch(fetchCurrentDraftRequest());
+    }
 
     return () => {
       dispatch(clearCurrentRequest());
       dispatch(resetOperationSuccess());
     };
-  }, [dispatch]);
+  }, [dispatch, routeId]);
 
   if (loading || !currentRequest) {
     return (

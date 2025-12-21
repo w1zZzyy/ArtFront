@@ -62,16 +62,10 @@ export const fetchRequestsList = createAsyncThunk<
       const res = await api.api.centerRequestList(query);
       console.log('fetchRequestsList: response =', res.data);
       console.log('fetchRequestsList: full response =', res);
-      
-      let filteredData = res.data;
-      
-      // Фильтрация для модератора: показываем только заявки, где он модератор
-      if (filters.isModerator && filters.userId) {
-        filteredData = res.data.filter(request => request.id_moderator === filters.userId);
-        console.log('fetchRequestsList: filtered for moderator =', filteredData);
-      }
-      
-      return filteredData;
+
+      // Бэкенд сам учитывает роль пользователя (модератор/пользователь),
+      // поэтому дополнительные фильтры по id_moderator на фронте не делаем.
+      return res.data;
     } catch (err: any) {
       console.error('fetchRequestsList: error =', err);
       return rejectWithValue('Не удалось загрузить список заявок');
