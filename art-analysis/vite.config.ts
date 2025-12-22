@@ -44,10 +44,10 @@ export default defineConfig({
     })
   ],
   server: {
-    https: {
+    /* https: {
       key: fs.readFileSync(path.resolve(__dirname, 'cert.key')),
       cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt')),
-    },
+    }, */
     port: 5173,
     proxy: {
       '/api': {
