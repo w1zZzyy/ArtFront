@@ -262,6 +262,35 @@ export const resolveRequest = createAsyncThunk<
   }
 );
 
+// Запустить асинхронный анализ заявки
+export const startAsyncAnalysis = createAsyncThunk<
+  { status: string; request_id: number; message: string },
+  number,
+  { rejectValue: string }
+>(
+  'request/startAsyncAnalysis',
+  async (id, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`http://localhost:8080/api/center_request/${id}/analyze`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Ошибка запуска анализа');
+      }
+      
+      return await response.json();
+    } catch (err: any) {
+      return rejectWithValue('Не удалось запустить асинхронный анализ');
+    }
+  }
+);
+
 export const fetchExpertById = createAsyncThunk<
   IArtExpert,
   number,

@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Container, Table, Form, Row, Col, Badge, Spinner, Card, Button } from 'react-bootstrap';
+import { Container, Table, Form, Row, Col, Badge, Spinner, Card, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Funnel, Calendar } from 'react-bootstrap-icons';
+import { Funnel, Calendar, Lightning, CheckCircle, XCircle } from 'react-bootstrap-icons';
 import type { AppDispatch, RootState } from '../store';
 import { AppNavbar } from '../components/Navbar';
-import { fetchRequestsList, resolveRequest } from '../store/requestSlice';
+import { fetchRequestsList, resolveRequest, startAsyncAnalysis } from '../store/requestSlice';
 import './styles/RequestsList.css';
 
 // Статусы заявок (русские значения для бэкенда)
@@ -191,6 +191,7 @@ export const RequestsList = () => {
                       <th>Дата создания</th>
                       <th>Дата формирования</th>
                       <th>Результат (X / Y)</th>
+                      <th>Анализ</th>
                       {isModerator && <th>Действия</th>}
                     </tr>
                   </thead>
@@ -224,6 +225,56 @@ export const RequestsList = () => {
                               </span>
                             ) : (
                               <span className="text-muted small">--</span>
+                            )}
+                          </td>
+                          <td>
+                            {/* Результат асинхронного анализа */}
+                            {(request as any).analysis_result ? (
+                              <OverlayTrigger
+                                placement="top"
+                                overlay={
+                                  <Tooltip>
+                                    {(request as any).analysis_result}
+                                    {(request as any).confidence_score && (
+                                      <div>Уверенность: {((request as any).confidence_score * 100).toFixed(1)}%</div>
+                                    )}
+                                  </Tooltip>
+                                }
+                              >
+                                <span>
+                                  {(request as any).analysis_success ? (
+                                    <Badge bg="success" className="d-flex align-items-center gap-1">
+                                      <CheckCircle size={12} /> Готов
+                                    </Badge>
+                                  ) : (
+                                    <Badge bg="warning" className="d-flex align-items-center gap-1">
+                                      <XCircle size={12} /> Ошибка
+                                    </Badge>
+                                  )}
+                                </span>
+                              </OverlayTrigger>
+                            ) : isModerator && ['сформирован', 'завершён', 'formed', 'completed'].includes((request as any).request_status) ? (
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                className="d-flex align-items-center gap-1"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (!request.id_request) return;
+                                  dispatch(startAsyncAnalysis(request.id_request))
+                                    .unwrap()
+                                    .then(() => {
+                                      alert('Анализ запущен! Результат появится через 5-10 секунд.');
+                                    })
+                                    .catch(() => {
+                                      alert('Не удалось запустить анализ');
+                                    });
+                                }}
+                              >
+                                <Lightning size={14} /> Анализ
+                              </Button>
+                            ) : (
+                              <span className="text-muted small">—</span>
                             )}
                           </td>
                           {isModerator && (
@@ -282,7 +333,7 @@ export const RequestsList = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={6} className="text-center py-5 text-muted">
+                        <td colSpan={isModerator ? 8 : 7} className="text-center py-5 text-muted">
                           Заявок не найдено
                         </td>
                       </tr>
