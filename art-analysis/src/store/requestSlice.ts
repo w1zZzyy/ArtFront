@@ -141,7 +141,8 @@ export const addExpertToDraft = createAsyncThunk(
         expertId,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      dispatch(fetchCurrentDraftInfo());
+      // Загружаем полную заявку с экспертами для обновления UI
+      await dispatch(fetchCurrentDraftRequest());
       return res.data;
     } catch (err: any) {
       return rejectWithValue('Не удалось добавить эксперта');

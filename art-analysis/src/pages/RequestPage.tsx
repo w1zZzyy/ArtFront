@@ -419,7 +419,6 @@ const RequestPage: React.FC = () => {
                     <h3>Информация о заявке</h3>
                     <div className="result-info">
                       <p><strong>Создана:</strong> {currentRequest.date_created ? new Date(currentRequest.date_created).toLocaleString('ru-RU') : '—'}</p>
-                      <p><strong>Сформирована:</strong> {currentRequest.date_formed ? new Date(currentRequest.date_formed).toLocaleString('ru-RU') : '—'}</p>
                       <p><strong>Завершена:</strong> {currentRequest.date_conclusion ? new Date(currentRequest.date_conclusion).toLocaleString('ru-RU') : '—'}</p>
                       <p><strong>Описание:</strong> {currentRequest.description || 'Нет описания'}</p>
                     </div>

@@ -14,25 +14,32 @@ import {
 import { Link } from 'react-router-dom';
 import { AppNavbar } from '../components/Navbar';
 import { ExpertCard } from '../components/ExpertCard';
-import { getArtExperts, getDraftTaskInfo } from '../api/expertsApi';
-import type { IArtExpert, DraftTaskInfo } from '../types/types';
+import { getArtExperts } from '../api/expertsApi';
+import type { IArtExpert } from '../types/types';
 import { MOCK_ART_EXPERTS } from '../api/mock';
 import './styles/ExpertsList.css';
 
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { setSearchTerm, selectSearchTerm } from '../store/filterSlice';
+import { fetchCurrentDraftRequest } from '../store/requestSlice';
 
 export const ExpertsList = () => {
   const [experts, setExperts] = useState<IArtExpert[]>([]);
   const [loading, setLoading] = useState(true);
-  const [draftTask, setDraftTask] = useState<DraftTaskInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const USE_MOCK = false;
 
   const searchTerm = useSelector((state: RootState) => selectSearchTerm(state));
+  const currentRequest = useSelector((state: RootState) => state.request.currentRequest);
   const dispatch = useDispatch<AppDispatch>();
+
+  // Вычисляем данные для корзины из Redux store
+  const draftTask = currentRequest && currentRequest.request_status === 'черновик' ? {
+    id_request: currentRequest.id_request,
+    experts_count: currentRequest.experts?.length ?? 0,
+  } : null;
 
   const fetchExperts = async () => {
     setLoading(true);
@@ -53,22 +60,11 @@ export const ExpertsList = () => {
     }
   };
 
-  // Здесь можно вызывать API для получения текущего черновика
-  const fetchDraftTask = async () => {
-    try {
-      const task = await getDraftTaskInfo();
-      setDraftTask(task);
-      console.info('Проверка загрузки задачи:', task.experts_count);
-    } catch (err) {
-      console.error('Ошибка загрузки черновика:', err);
-      setDraftTask(null);
-    }
-  };
-
   useEffect(() => {
     fetchExperts();
-    fetchDraftTask();
-  }, [searchTerm]);
+    // Загружаем текущий черновик через Redux
+    dispatch(fetchCurrentDraftRequest());
+  }, [searchTerm, dispatch]);
 
   const handleSearchSubmit = (event: React.FormEvent) => {
     event.preventDefault();
