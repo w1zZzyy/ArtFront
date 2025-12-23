@@ -30,3 +30,6 @@ dist-ssr
 
 *.crt
 *.key
+
+new_dist
+dev-dist
