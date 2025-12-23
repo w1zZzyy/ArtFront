@@ -178,7 +178,9 @@ const RequestPage: React.FC = () => {
                     },
                   })
                 }
-                onBlur={handleSaveDescription}
+                disabled={!isDraft}
+                style={{ opacity: isDraft ? 1 : 0.7, cursor: isDraft ? 'text' : 'not-allowed' }}
+                placeholder="Введите описание заявки..."
               />
             </div>
 
@@ -249,6 +251,7 @@ const RequestPage: React.FC = () => {
                                 },
                               });
                             }}
+                            disabled={!isDraft && !(isModerator && isFormed)}
                           />
                         </div>
 
@@ -270,39 +273,44 @@ const RequestPage: React.FC = () => {
                                 },
                               });
                             }}
+                            disabled={!isDraft && !(isModerator && isFormed)}
                           />
                         </div>
                       </div>
 
-                      <div className="expert-actions">
-                        <button
-                          className="expert-save-btn"
-                          onClick={() => handleSaveData()}
-                          disabled={!isDraft && !isModerator}
-                        >
-                          Сохранить координаты
-                        </button>
-                      </div>
+                      {(isDraft || (isModerator && isFormed)) && (
+                        <div className="expert-actions">
+                          <button
+                            className="expert-save-btn"
+                            onClick={() => handleSaveData()}
+                            disabled={link.center_x === null || link.center_x === undefined || link.center_y === null || link.center_y === undefined}
+                          >
+                            Сохранить координаты
+                          </button>
+                        </div>
+                      )}
                     </div>
 
-                    <button
-                      className="basket-remove-btn"
-                      onClick={() =>
-                        link.id_artcenter &&
-                        dispatch(
-                          removeExpertFromRequest({
-                            requestId: requestId!,
-                            expertId: link.id_artcenter,
-                          })
-                        )
-                      }
-                    >
-                      <img
-                        src="/ArtFront/images/bin.png"
-                        alt="Удалить"
-                        style={{ width: '50px', height: '50px' }}
-                      />
-                    </button>
+                    {isDraft && (
+                      <button
+                        className="basket-remove-btn"
+                        onClick={() =>
+                          link.id_artcenter &&
+                          dispatch(
+                            removeExpertFromRequest({
+                              requestId: requestId!,
+                              expertId: link.id_artcenter,
+                            })
+                          )
+                        }
+                      >
+                        <img
+                          src="/ArtFront/images/bin.png"
+                          alt="Удалить"
+                          style={{ width: '50px', height: '50px' }}
+                        />
+                      </button>
+                    )}
 
                   </div>
                 </div>
@@ -313,26 +321,54 @@ const RequestPage: React.FC = () => {
           {/* Нижняя панель действий */}
           <div className="request-footer">
             {isDraft && (
+              <>
+                <button
+                  className="form-button"
+                  onClick={handleFormRequest}
+                  disabled={expertLinks.length === 0}
+                >
+                  Оформить заявку
+                </button>
+
+                <button
+                  className="request-delete-button"
+                  onClick={() => {
+                    if (!requestId) return;
+                    if (!confirm('Удалить заявку? Это действие нельзя отменить.')) return;
+                    dispatch(deleteRequest(requestId))
+                      .unwrap()
+                      .then(() => {
+                        navigate('/experts');
+                      });
+                  }}
+                >
+                  <Trash size={16} />
+                  Удалить заявку
+                </button>
+              </>
+            )}
+
+            {/* Для завершённых заявок - кнопка просмотра результатов */}
+            {isCompleted && (
               <button
                 className="form-button"
-                onClick={handleFormRequest}
-                disabled={expertLinks.length === 0}
+                onClick={() => setShowResultModal(true)}
               >
-                Оформить заявку
+                Показать результаты
               </button>
             )}
 
-            <button
-              className="request-delete-button"
-              onClick={() =>
-                requestId &&
-                confirm('Удалить заявку? Это действие нельзя отменить.') &&
-                dispatch(deleteRequest(requestId))
-              }
-            >
-              <Trash size={16} />
-              Удалить заявку
-            </button>
+            {/* Кнопка "Сохранить описание" для черновиков */}
+            {isDraft && (
+              <button
+                className="save-description-button"
+                onClick={handleSaveDescription}
+                disabled={!(currentRequest.description ?? '').trim()}
+              >
+                <img src="/ArtFront/images/save.png" alt="" style={{ width: '20px', height: '20px' }} />
+                Сохранить описание
+              </button>
+            )}
           </div>
 
           {/* Модальное окно с результатом */}
