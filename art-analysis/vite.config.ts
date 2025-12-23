@@ -1,55 +1,48 @@
+// vite.config.ts
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { VitePWA } from 'vite-plugin-pwa';
-import fs from 'fs'
-import path from 'path'
+//import { VitePWA } from 'vite-plugin-pwa';
+//import mkcert from 'vite-plugin-mkcert'
 
 export default defineConfig({
-  base: '/ArtFront/', 
+  base: './',
+  build: {
+    outDir: 'new_dist',
+    emptyOutDir: true
+  },
   plugins: [
-    react(),
-    VitePWA({
-      registerType: 'autoUpdate',       // автообновление сервис-воркера
-      devOptions: {
-        enabled: true,
-      }, 
-      includeAssets: ['favicon.svg', 'robots.txt', 'apple-touch-icon.png'],
-      manifest: {
-        name: 'Art Analysis',
-        short_name: 'ArtAnalysis',
-        description: 'Приложение для анализа и выбора экспертов',
-        theme_color: '#000000',
-        background_color: '#F4F4F4',
-        display: 'standalone',          // standalone делает PWA как отдельное приложение
-        start_url: '/ArtFront/',
-        icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
-        ]
-      }
-    })
+    //mkcert(),
+    react(), 
+    // VitePWA({ 
+    //   registerType: 'autoUpdate',
+    //   devOptions: {
+    //     enabled: true,
+    //   }, 
+    //   manifest:{
+    //     "name": "IBM quantum computing",
+    //     "short_name": "QCaaS",
+    //     "start_url": "/RIP_SPA/",
+    //     "display": "standalone",
+    //     "background_color": "#fdfdfd",
+    //     "theme_color": "#db4938",
+    //     "orientation": "portrait-primary",
+    //     "icons": [
+    //       {
+    //         "src": "/logo192.png",
+    //         "type": "image/png", "sizes": "192x192"
+    //       },
+    //       {
+    //         "src": "/logo512.png",
+    //         "type": "image/png", "sizes": "512x512"
+    //       }
+    //     ]
+    //   }
+    // })
   ],
   server: {
-    https: {
-      key: fs.readFileSync(path.resolve(__dirname, 'cert.key')),
-      cert: fs.readFileSync(path.resolve(__dirname, 'cert.crt')),
-    },
     port: 5173,
     proxy: {
+      // Проксируем все /api и /health на бэкенд
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { HashRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { AppNavbar } from './components/Navbar';
 import { HomePage } from './pages/StartPage';
 import { ExpertsList } from './pages/ExpertsList';
@@ -15,7 +15,7 @@ const MainLayout = () => (
 
 function App() {
     return (
-        <BrowserRouter basename="/ArtFront"> 
+        <HashRouter> 
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/ArtAnalysis" element={<HomePage />} />
@@ -24,7 +24,7 @@ function App() {
                 <Route element={<MainLayout />}>
                 </Route>
             </Routes>
-        </BrowserRouter>
+        </HashRouter>
     );
 }
 

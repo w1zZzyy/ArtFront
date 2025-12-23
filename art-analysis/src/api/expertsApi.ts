@@ -5,6 +5,9 @@ import {
     getMockArtExpertById
 } from './mock';
 
+// Базовый URL бэкенда
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 // Состояние доступности бэкенда
 let isBackendAvailable: boolean | null = null;
 
@@ -13,7 +16,7 @@ const checkBackendAvailability = async (): Promise<boolean> => {
     if (isBackendAvailable !== null) return isBackendAvailable;
     
     try {
-        const response = await fetch('/health', {
+        const response = await fetch(`${API_BASE_URL}/health`, {
             method: 'GET',
             signal: AbortSignal.timeout(3000)
         });
@@ -81,8 +84,8 @@ export const getArtExperts = async (title?: string): Promise<IArtExpert[]> => {
     
     try {
         const url = title
-            ? `/api/experts?title=${encodeURIComponent(title)}`
-            : '/api/experts';
+            ? `${API_BASE_URL}/api/experts?title=${encodeURIComponent(title)}`
+            : `${API_BASE_URL}/api/experts`;
 
         const res = await fetchWithTimeout(url);
         if (!res.ok) throw new Error('Ошибка загрузки экспертов');
@@ -106,7 +109,7 @@ export const getArtExpertById = async (id: string): Promise<IArtExpert> => {
     }
     
     try {
-        const response = await fetchWithTimeout(`/api/experts/${id}`);
+        const response = await fetchWithTimeout(`${API_BASE_URL}/api/experts/${id}`);
         if (!response.ok) throw new Error('Expert not found');
         
         const apiData = await response.json();
