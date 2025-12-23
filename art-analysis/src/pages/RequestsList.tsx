@@ -8,19 +8,26 @@ import { AppNavbar } from '../components/Navbar';
 import { fetchRequestsList, resolveRequest } from '../store/requestSlice';
 import './styles/RequestsList.css';
 
-// Статусы заявок (как в swagger, но поддерживаем и русские варианты из бэкенда)
-const STATUS_DRAFT = 'draft';
-const STATUS_FORMED = 'formed';
-const STATUS_COMPLETED = 'completed';
-const STATUS_REJECTED = 'rejected';
+// Статусы заявок (русские значения для бэкенда)
+const STATUS_DRAFT = 'черновик';
+const STATUS_FORMED = 'сформирован';
+const STATUS_COMPLETED = 'завершён';
+const STATUS_REJECTED = 'отклонён';
+
+// Получаем сегодняшнюю дату в формате YYYY-MM-DD для input type="date"
+const getTodayDate = () => {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+};
+
+// Форматирование даты в российский формат (дд.мм.гггг)
+const formatDateRu = (dateStr: string) => {
+  if (!dateStr) return '';
+  const [year, month, day] = dateStr.split('-');
+  return `${day}.${month}.${year}`;
+};
 
 const getStatusBadge = (status: string | undefined) => {
-  // Мапим и английские, и русские статусы в бейджи
-  if (status === 'черновик') status = STATUS_DRAFT;
-  if (status === 'сформирован') status = STATUS_FORMED;
-  if (status === 'завершён') status = STATUS_COMPLETED;
-  if (status === 'отклонён') status = STATUS_REJECTED;
-
   switch (status) {
     case STATUS_DRAFT:
       return <Badge bg="secondary">Черновик</Badge>;
@@ -47,21 +54,22 @@ export const RequestsList = () => {
   const isModerator = !!userObj?.is_admin;
 
   const isFormedStatus = (status: string | undefined) => {
-    return status === STATUS_FORMED || status === 'сформирован';
+    return status === STATUS_FORMED;
   };
 
-  // Фильтры
+  // Фильтры (по умолчанию "за сегодня")
+  const todayStr = getTodayDate();
   const [filters, setFilters] = useState({
     status: 'all',
-    from: '',
-    to: '',
+    from: todayStr,
+    to: todayStr,
   });
 
   const buildApiFilters = () => {
     const apiFilters: any = {};
     if (filters.status !== 'all') apiFilters.status = filters.status;
-    if (filters.from) apiFilters.from = filters.from;
-    if (filters.to) apiFilters.to = filters.to;
+    if (filters.from) apiFilters.from = filters.from + 'T00:00:00';
+    if (filters.to) apiFilters.to = filters.to + 'T23:59:59';
     return apiFilters;
   };
 
@@ -122,7 +130,7 @@ export const RequestsList = () => {
                   </Col>
                   <Col md={3}>
                     <Form.Label className="fw-bold small text-muted">
-                      <Calendar size={14} /> Дата от
+                      <Calendar size={14} /> Дата от {filters.from && <span className="text-primary">({formatDateRu(filters.from)})</span>}
                     </Form.Label>
                     <Form.Control
                       type="date"
@@ -130,11 +138,12 @@ export const RequestsList = () => {
                       value={filters.from}
                       onChange={handleFilterChange}
                       size="sm"
+                      lang="ru"
                     />
                   </Col>
                   <Col md={3}>
                     <Form.Label className="fw-bold small text-muted">
-                      <Calendar size={14} /> Дата до
+                      <Calendar size={14} /> Дата до {filters.to && <span className="text-primary">({formatDateRu(filters.to)})</span>}
                     </Form.Label>
                     <Form.Control
                       type="date"
@@ -142,15 +151,23 @@ export const RequestsList = () => {
                       value={filters.to}
                       onChange={handleFilterChange}
                       size="sm"
+                      lang="ru"
                     />
                   </Col>
-                  <Col md={2} className="text-end">
+                  <Col md={2} className="d-flex gap-2 justify-content-end">
                     <Button
                       variant="outline-dark"
                       size="sm"
+                      onClick={() => setFilters({ status: 'all', from: todayStr, to: todayStr })}
+                    >
+                      Сегодня
+                    </Button>
+                    <Button
+                      variant="outline-secondary"
+                      size="sm"
                       onClick={() => setFilters({ status: 'all', from: '', to: '' })}
                     >
-                      Сбросить
+                      Все
                     </Button>
                   </Col>
                 </Row>
