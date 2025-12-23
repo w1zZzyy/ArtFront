@@ -30,6 +30,7 @@ dist-ssr
 
 *.crt
 *.key
+.env
 
 new_dist
 dev-dist
