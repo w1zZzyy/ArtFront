@@ -36,7 +36,8 @@ export const ExpertsList = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   // Вычисляем данные для корзины из Redux store
-  const draftTask = currentRequest && currentRequest.request_status === 'draft' ? {
+  // Статус может быть "draft" или "черновик" (на русском в БД)
+  const draftTask = currentRequest && (currentRequest.request_status === 'draft' || currentRequest.request_status === 'черновик') ? {
     id_request: currentRequest.id_request,
     experts_count: currentRequest.experts?.length ?? 0,
   } : null;

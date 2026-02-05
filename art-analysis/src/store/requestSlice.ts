@@ -80,9 +80,7 @@ export const fetchCurrentDraftInfo = createAsyncThunk(
     try {
       const token = localStorage.getItem('authToken');
       if (!token) return rejectWithValue('Нет токена авторизации');
-      const res = await (api.api.centerRequestCurrentList as any)({
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.api.centerRequestCurrentList();
       return res.data;
     } catch (err: any) {
       return rejectWithValue('Не удалось получить данные черновика');
