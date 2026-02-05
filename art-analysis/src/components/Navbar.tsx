@@ -19,8 +19,8 @@ export const AppNavbar = () => {
             Experts
           </Link>
           {isAuth && (
-            <Link to="/requests" className="fs-5 text-dark text-decoration-none">
-              History
+            <Link to="/center_requests" className="fs-5 text-dark text-decoration-none">
+              Requests
             </Link>
           )}
         </div>
@@ -31,7 +31,7 @@ export const AppNavbar = () => {
             Experts
           </Link>
           {isAuth && (
-            <Link to="/requests" className="text-dark text-decoration-none" style={{ fontSize: '0.9rem' }}>
+            <Link to="/center_requests" className="text-dark text-decoration-none" style={{ fontSize: '0.9rem' }}>
               History
             </Link>
           )}

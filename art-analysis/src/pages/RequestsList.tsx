@@ -14,17 +14,27 @@ const STATUS_FORMED = 'сформирован';
 const STATUS_COMPLETED = 'завершён';
 const STATUS_REJECTED = 'отклонён';
 
-// Получаем сегодняшнюю дату в формате YYYY-MM-DD для input type="date"
-const getTodayDate = () => {
+// Получаем сегодняшнюю дату в формате DD.MM.YYYY для отображения
+const getTodayDateRu = () => {
   const today = new Date();
-  return today.toISOString().split('T')[0];
+  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const year = today.getFullYear();
+  return `${day}.${month}.${year}`;
 };
 
-// Форматирование даты в российский формат (дд.мм.гггг)
+// Конвертация DD.MM.YYYY в YYYY-MM-DD для API
+const convertToApiDate = (dateRu: string) => {
+  if (!dateRu) return '';
+  const parts = dateRu.split('.');
+  if (parts.length !== 3) return '';
+  const [day, month, year] = parts;
+  return `${year}-${month}-${day}`;
+};
+
+// Форматирование даты (уже в формате DD.MM.YYYY)
 const formatDateRu = (dateStr: string) => {
-  if (!dateStr) return '';
-  const [year, month, day] = dateStr.split('-');
-  return `${day}.${month}.${year}`;
+  return dateStr || '';
 };
 
 const getStatusBadge = (status: string | undefined) => {
@@ -58,7 +68,7 @@ export const RequestsList = () => {
   };
 
   // Фильтры (по умолчанию "за сегодня")
-  const todayStr = getTodayDate();
+  const todayStr = getTodayDateRu();
   const [filters, setFilters] = useState({
     status: 'all',
     from: todayStr,
@@ -68,8 +78,8 @@ export const RequestsList = () => {
   const buildApiFilters = () => {
     const apiFilters: any = {};
     if (filters.status !== 'all') apiFilters.status = filters.status;
-    if (filters.from) apiFilters.from = filters.from + 'T00:00:00';
-    if (filters.to) apiFilters.to = filters.to + 'T23:59:59';
+    if (filters.from) apiFilters.from = convertToApiDate(filters.from) + 'T00:00:00';
+    if (filters.to) apiFilters.to = convertToApiDate(filters.to) + 'T23:59:59';
     return apiFilters;
   };
 
@@ -94,7 +104,7 @@ export const RequestsList = () => {
   };
 
   const handleRowClick = (id: number | undefined) => {
-    if (id) navigate(`/request/${id}`);
+    if (id) navigate(`/center_request/${id}`);
   };
 
   return (
@@ -130,35 +140,35 @@ export const RequestsList = () => {
                   </Col>
                   <Col md={3}>
                     <Form.Label className="fw-bold small text-muted">
-                      <Calendar size={14} /> Дата от {filters.from && <span className="text-primary">({formatDateRu(filters.from)})</span>}
+                      <Calendar size={14} /> Дата от
                     </Form.Label>
                     <Form.Control
-                      type="date"
+                      type="text"
                       name="from"
                       value={filters.from}
                       onChange={handleFilterChange}
                       size="sm"
-                      lang="ru"
+                      placeholder="ДД.ММ.ГГГГ"
                     />
                   </Col>
                   <Col md={3}>
                     <Form.Label className="fw-bold small text-muted">
-                      <Calendar size={14} /> Дата до {filters.to && <span className="text-primary">({formatDateRu(filters.to)})</span>}
+                      <Calendar size={14} /> Дата до
                     </Form.Label>
                     <Form.Control
-                      type="date"
+                      type="text"
                       name="to"
                       value={filters.to}
                       onChange={handleFilterChange}
                       size="sm"
-                      lang="ru"
+                      placeholder="ДД.ММ.ГГГГ"
                     />
                   </Col>
                   <Col md={2} className="d-flex gap-2 justify-content-end">
                     <Button
                       variant="outline-dark"
                       size="sm"
-                      onClick={() => setFilters({ status: 'all', from: todayStr, to: todayStr })}
+                      onClick={() => setFilters({ status: 'all', from: getTodayDateRu(), to: getTodayDateRu() })}
                     >
                       Сегодня
                     </Button>
