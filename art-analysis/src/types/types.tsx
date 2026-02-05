@@ -1,3 +1,11 @@
+export interface IExpertMedia {
+  id_media: number;
+  id_artcenter: number;
+  media_url: string;
+  media_type: 'image' | 'video';
+  created_at: string;
+}
+
 export interface IArtExpert {
   id_artcenter: number;
   title: string;
@@ -6,6 +14,7 @@ export interface IArtExpert {
   name: string;
   algorithm: string;
   img_url: string;
+  media?: IExpertMedia[];
 }
 
 export interface DraftTaskInfo {

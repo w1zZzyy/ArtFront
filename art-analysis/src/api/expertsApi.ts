@@ -1,5 +1,5 @@
 // src/api/artExpertsApi.ts
-import type { IArtExpert, DraftTaskInfo } from '../types/types';
+import type { IArtExpert, IExpertMedia, DraftTaskInfo } from '../types/types';
 import { 
     getMockArtExperts,
     getMockArtExpertById, 
@@ -67,7 +67,8 @@ const normalizeExpertData = (data: any): IArtExpert => {
         status: data.status !== undefined ? data.status : data.Status || false,
         img_url: data.img_url || data.ImgURL || data.image_url || data.Image || null,
         name: data.name || data.Name || '',
-        algorithm: data.algorithm || data.Algorithm || ''
+        algorithm: data.algorithm || data.Algorithm || '',
+        media: data.media || data.Media || []
     };
 };
 
@@ -107,8 +108,15 @@ export const getArtExpertById = async (id: string): Promise<IArtExpert> => {
     }
     
     try {
-        const response = await fetchWithTimeout(`/api/experts/${id}`);
-        if (!response.ok) throw new Error('Expert not found');
+        // Используем /full эндпоинт для получения эксперта с медиафайлами
+        const response = await fetchWithTimeout(`/api/experts/${id}/full`);
+        if (!response.ok) {
+            // Fallback на обычный эндпоинт
+            const fallbackResponse = await fetchWithTimeout(`/api/experts/${id}`);
+            if (!fallbackResponse.ok) throw new Error('Expert not found');
+            const apiData = await fallbackResponse.json();
+            return normalizeExpertData(apiData);
+        }
         
         const apiData = await response.json();
         console.log('Эксперт с API по ID:', apiData);
@@ -125,6 +133,74 @@ export const getArtExpertById = async (id: string): Promise<IArtExpert> => {
         const expert = getMockArtExpertById(id);
         if (expert) return expert;
         throw new Error(`Эксперт с ID "${id}" не найден`);
+    }
+};
+
+// Получить медиафайлы эксперта
+export const getExpertMedia = async (id: string): Promise<IExpertMedia[]> => {
+    const backendAvailable = await checkBackendAvailability();
+    
+    if (!backendAvailable) {
+        console.log('Бэкенд недоступен для getExpertMedia');
+        return [];
+    }
+    
+    try {
+        const response = await fetchWithTimeout(`/api/experts/${id}/media`);
+        if (!response.ok) throw new Error('Ошибка загрузки медиафайлов');
+        return await response.json();
+    } catch (error) {
+        console.warn('Ошибка при запросе медиафайлов', error);
+        return [];
+    }
+};
+
+// Удалить медиафайл эксперта
+export const deleteExpertMedia = async (expertId: string, mediaId: number): Promise<boolean> => {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            throw new Error('No auth token found');
+        }
+
+        const response = await fetchWithTimeout(`/api/experts/${expertId}/media/${mediaId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        return response.ok;
+    } catch (error) {
+        console.error('Ошибка при удалении медиафайла', error);
+        return false;
+    }
+};
+
+// Загрузить медиафайл эксперта
+export const uploadExpertMedia = async (expertId: string, file: File): Promise<IExpertMedia | null> => {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            throw new Error('No auth token found');
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetchWithTimeout(`/api/experts/${expertId}/media`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+        
+        if (!response.ok) throw new Error('Ошибка загрузки медиафайла');
+        return await response.json();
+    } catch (error) {
+        console.error('Ошибка при загрузке медиафайла', error);
+        return null;
     }
 };
 
