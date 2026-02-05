@@ -84,7 +84,7 @@ export const AppNavbar = () => {
               <Link to="/login" className="btn btn-outline-dark btn-sm" style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}>
                 Войти
               </Link>
-              <Link to="/register" className="btn btn-outline-primary btn-sm d-none d-sm-inline" style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}>
+              <Link to="/register" className="btn btn-outline-primary btn-sm" style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}>
                 Регистрация
               </Link>
             </>

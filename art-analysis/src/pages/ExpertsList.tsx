@@ -36,7 +36,7 @@ export const ExpertsList = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   // Вычисляем данные для корзины из Redux store
-  const draftTask = currentRequest && currentRequest.request_status === 'черновик' ? {
+  const draftTask = currentRequest && currentRequest.request_status === 'draft' ? {
     id_request: currentRequest.id_request,
     experts_count: currentRequest.experts?.length ?? 0,
   } : null;
@@ -88,80 +88,95 @@ export const ExpertsList = () => {
   return (
     <div className="experts-body">
       <AppNavbar />
-      <Container fluid className="px-3 px-md-4 pt-3 pt-md-4">
-        <div>
+      
+      {/* Sticky header with search and cart */}
+      <div className="experts-sticky-header">
+        <Container fluid className="px-3 px-md-4">
           <h1 className="experts-s-t">Выберите эксперта</h1>
-        </div>
 
-        <Form onSubmit={handleSearchSubmit}>
-          <Row className="experts-s-f">
-            <Col xs={12}>
-              <div className="d-flex align-items-center w-100">
-                <Form.Control
-                  type="search"
-                  placeholder="Введите имя эксперта"
-                  value={searchTerm}
-                  onChange={(e) => dispatch(setSearchTerm(e.target.value))}
-                  className="experts-s-f input flex-grow-1"
-                />
-                <Button
-                  variant="dark"
-                  type="submit"
-                  disabled={loading}
-                  className="experts-s-f button"
-                  style={{ flexShrink: 0 }}
-                >
-                  {loading ? 'Поиск...' : 'Найти'}
-                </Button>
+          <Form onSubmit={handleSearchSubmit}>
+            <Row className="experts-s-f align-items-center">
+              <Col xs={12}>
+                <div className="d-flex align-items-center w-100">
+                  <div className="d-flex flex-grow-1" style={{ marginRight: '10px' }}>
+                    <Form.Control
+                      type="search"
+                      placeholder="Введите имя эксперта"
+                      value={searchTerm}
+                      onChange={(e) => dispatch(setSearchTerm(e.target.value))}
+                      className="flex-grow-1"
+                      style={{ 
+                        borderRadius: '8px 0 0 8px',
+                        border: '2px solid #e1e5eb',
+                        borderRight: 'none'
+                      }}
+                    />
+                    <Button
+                      variant="dark"
+                      type="submit"
+                      disabled={loading}
+                      style={{ 
+                        borderRadius: '0 8px 8px 0',
+                        border: '2px solid #000000',
+                        borderLeft: 'none',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {loading ? 'Поиск...' : 'Найти'}
+                    </Button>
+                  </div>
 
-                <div className="cart-wrapper">
-                  {draftTask?.experts_count && draftTask.experts_count > 0 ? (
-                    <Link to={`/request/${draftTask.id_request}`} className="d-flex align-items-center position-relative">
-                      <Image
-                        src="/ArtFront/images/cart.png"
-                        alt="Корзина"
-                        className="d-none d-md-block"
-                        width={60}
-                        height={60}
-                      />
-                      <Image
-                        src="/ArtFront/images/cart.png"
-                        alt="Корзина"
-                        className="d-md-none"
-                        width={45}
-                        height={45}
-                      />
-                      <Badge pill bg="secondary" className="cart-indicator">
-                        {draftTask.experts_count}
-                      </Badge>
-                    </Link>
-                  ) : (
-                    <span style={{ cursor: 'not-allowed' }} className="d-flex align-items-center">
-                      <Image
-                        src="/ArtFront/images/cart.png"
-                        alt="Корзина"
-                        className="d-none d-md-block"
-                        width={60}
-                        height={60}
-                        style={{ opacity: 0.5 }}
-                      />
-                      <Image
-                        src="/ArtFront/images/cart.png"
-                        alt="Корзина"
-                        className="d-md-none"
-                        width={45}
-                        height={45}
-                        style={{ opacity: 0.5 }}
-                      />
-                    </span>
-                  )}
+                  <div className="cart-wrapper">
+                    {draftTask?.experts_count && draftTask.experts_count > 0 ? (
+                      <Link to={`/request/${draftTask.id_request}`} className="d-flex align-items-center position-relative">
+                        <Image
+                          src="/ArtFront/images/cart.png"
+                          alt="Корзина"
+                          className="d-none d-md-block"
+                          width={50}
+                          height={50}
+                        />
+                        <Image
+                          src="/ArtFront/images/cart.png"
+                          alt="Корзина"
+                          className="d-md-none"
+                          width={40}
+                          height={40}
+                        />
+                        <Badge pill bg="secondary" className="cart-indicator">
+                          {draftTask.experts_count}
+                        </Badge>
+                      </Link>
+                    ) : (
+                      <span style={{ cursor: 'not-allowed' }} className="d-flex align-items-center">
+                        <Image
+                          src="/ArtFront/images/cart.png"
+                          alt="Корзина"
+                          className="d-none d-md-block"
+                          width={50}
+                          height={50}
+                          style={{ opacity: 0.5 }}
+                        />
+                        <Image
+                          src="/ArtFront/images/cart.png"
+                          alt="Корзина"
+                          className="d-md-none"
+                          width={40}
+                          height={40}
+                          style={{ opacity: 0.5 }}
+                        />
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Col>
-          </Row>
-        </Form>
+              </Col>
+            </Row>
+          </Form>
+        </Container>
+      </div>
 
-        {error && <Alert variant="danger">{error}</Alert>}
+      <Container fluid className="px-3 px-md-4 experts-cards-container">
+        {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
 
         {loading ? (
           <div className="text-center my-5">

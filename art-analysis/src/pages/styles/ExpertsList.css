@@ -10,10 +10,11 @@ html {
 
 /*===========Experts=list============*/
 .experts-body {
-    width: 100vw;    
+    width: 100%;    
     min-height: 100vh;
     margin: 0;
-    padding: 80px 0 0 0;
+    padding-top: 56px; /* высота navbar */
+    padding-bottom: 20px;
     box-sizing: border-box;
     background-repeat: no-repeat;
     background-size: cover;
@@ -21,31 +22,45 @@ html {
     background-color: #F4F4F4;
 }
 
+/*-----------sticky header-----------*/
+.experts-sticky-header {
+    position: sticky;
+    top: 56px; /* высота navbar */
+    background-color: #F4F4F4;
+    z-index: 100;
+    padding: 10px 0 8px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #e1e5eb;
+}
+
 /*-----------start-text-----------*/
 .experts-s-t {
     font-family: 'Roboto', Arial, sans-serif;
-    font-size: 24px;
-    margin-left: 20px;
+    font-size: clamp(16px, 2.5vw, 20px);
+    margin-left: 0;
+    margin-bottom: 6px;
+    margin-top: 0;
+    font-weight: 500;
 }
 
 /*------searching-field--------*/
 .experts-s-f {
     display: flex !important;
-    align-items: center !important;
-    max-width: 700px;
-    margin: 15px 20px;
+    align-items: stretch !important;
+    max-width: 650px;
+    margin: 0 0 8px 0;
     font-family: 'Roboto', Arial, sans-serif;
     gap: 0 !important;
 }
 
 .experts-s-f .form-control {
     flex: 1;
-    padding: 12px 16px !important;
+    padding: 10px 14px !important;
     border: 2px solid #e1e5eb !important;
     border-right: none !important;
-    border-radius: 10px 0 0 10px !important;
+    border-radius: 8px 0 0 8px !important;
     outline: none !important;
-    font-size: 18px !important;
+    font-size: 15px !important;
     font-family: 'Roboto', Arial, sans-serif !important;
     transition: border-color 0.3s ease !important;
     margin: 0 !important;
@@ -57,14 +72,14 @@ html {
 }
 
 .experts-s-f .btn {
-    padding: 12px 24px !important;
+    padding: 10px 20px !important;
     border: 2px solid #000000 !important;
     border-left: none !important;
-    border-radius: 0 10px 10px 0 !important;
+    border-radius: 0 8px 8px 0 !important;
     background-color: rgba(52, 58, 63, 1) !important;
     color: white !important;
     font-weight: 500 !important;
-    font-size: 16px !important;
+    font-size: 14px !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
     white-space: nowrap !important;
@@ -81,19 +96,22 @@ html {
     position: relative;
     display: flex;
     align-items: center;
-    margin-left: 15px !important;
+    justify-content: center;
+    margin-left: 12px !important;
+    flex-shrink: 0;
 }
 
 .cart-indicator {
     position: absolute;
-    top: -5px;
-    right: -5px;
-    min-width: 20px;
-    height: 20px;
+    top: -8px;
+    right: -8px;
+    min-width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.75rem;
+    z-index: 10;
 }
 
 .experts-t-b {
@@ -129,18 +147,34 @@ html {
     width: 90px;
     height: 90px;
 }
+/*---------------cards container----------------*/
+.experts-cards-container {
+    position: sticky;
+    top: 160px; /* navbar (56px) + sticky header (~104px) */
+    background-color: #F4F4F4;
+    z-index: 50;
+    overflow-y: auto;
+    max-height: calc(100vh - 160px);
+    padding-top: 20px;
+}
+
 /*---------------template/cards----------------*/
 .experts-templ {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 50px !important;
-    margin: 15px auto 20px;
+    margin: 0 auto 30px;
     max-width: 1400px;
-    padding: 0 10px;
-}   
+    padding: 0 20px;
+}
+
 .experts-templ > .col {
     max-width: 100%;
+    padding: 0.75rem;
+}
+
+.experts-templ .row {
+    margin: 0 -0.75rem;
 }
 
 .expert-card {
@@ -148,15 +182,16 @@ html {
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
+    transition: transform 0.2s ease;
 }
 
 /* Card image с пропорциями */
 .expert-crd-img {
     width: 100%;
-    height: 0;
-    padding-top: 66%; /* соотношение 3:2 */
+    aspect-ratio: 3 / 2;
     position: relative;
     overflow: hidden;
+    background: #e9ecef;
 }
 
 .expert-crd-img img {
@@ -174,7 +209,14 @@ html {
 @media (min-width: 1400px) {
     .experts-templ {
         max-width: 1600px;
-        gap: 60px !important;
+    }
+    
+    .experts-templ > .col {
+        padding: 1rem;
+    }
+    
+    .experts-templ .row {
+        margin: 0 -1rem;
     }
 }
 
@@ -182,49 +224,52 @@ html {
 @media (max-width: 1200px) {
     .experts-templ {
         max-width: 1200px;
-        gap: 40px !important;
-        padding: 0 20px;
+        padding: 0 15px;
     }
 
     .experts-s-t {
-        font-size: 22px;
+        font-size: clamp(18px, 2.5vw, 22px);
         margin-left: 25px;
     }
 }
 
 /* Планшеты горизонтально (768px - 1024px) */
 @media (max-width: 1024px) {
-    .experts-body {
-        padding: 75px 0 0 0;
+    .experts-sticky-header {
+        padding: 12px 0;
     }
 
     .experts-s-t {
-        font-size: 22px;
+        font-size: clamp(16px, 2.5vw, 20px);
         margin-left: 15px;
+        margin-bottom: 12px;
     }
 
     .experts-s-f {
-        margin: 12px 15px;
+        margin: 0 15px 12px 15px;
     }
 
     .experts-templ {
-        gap: 30px !important;
-        padding: 0 15px;
+        padding: 0 12px;
     }
-
-    .expert-crd-img {
-        padding-top: 65%;
+    
+    .experts-templ > .col {
+        padding: 0.5rem;
+    }
+    
+    .experts-templ .row {
+        margin: 0 -0.5rem;
     }
 }
 
 /* Планшеты вертикально (600px - 768px) */
 @media (max-width: 768px) {
-    .experts-body {
-        padding: 70px 0 0 0;
+    .experts-sticky-header {
+        padding: 10px 0;
     }
 
     .experts-s-t {
-        font-size: 20px;
+        font-size: clamp(16px, 2.5vw, 18px);
         margin-left: 12px;
         margin-bottom: 10px;
     }
@@ -232,7 +277,7 @@ html {
     .experts-s-f {
         flex-direction: row !important;
         max-width: 100% !important;
-        margin: 10px 12px 15px 12px !important;
+        margin: 0 12px 12px 12px !important;
         gap: 0 !important;
     }
 
@@ -241,7 +286,7 @@ html {
         border: 2px solid #e1e5eb !important;
         border-right: none !important;
         border-radius: 8px 0 0 8px !important;
-        font-size: 14px !important;
+        font-size: clamp(13px, 2vw, 14px) !important;
         padding: 10px 12px !important;
     }
 
@@ -250,7 +295,7 @@ html {
         border: 2px solid #000000 !important;
         border-left: none !important;
         border-radius: 0 8px 8px 0 !important;
-        font-size: 14px !important;
+        font-size: clamp(13px, 2vw, 14px) !important;
         padding: 10px 16px !important;
     }
 
@@ -259,8 +304,8 @@ html {
     }
 
     .cart-wrapper img {
-        width: 50px !important;
-        height: 50px !important;
+        width: 48px !important;
+        height: 48px !important;
     }
 
     .experts-t-b img {
@@ -269,40 +314,43 @@ html {
     }
 
     .experts-templ {
-        gap: 25px !important;
         margin: 15px auto;
-        padding: 0 15px;
+        padding: 0 10px;
     }
-
-    .expert-crd-img {
-        padding-top: 70%;
+    
+    .experts-templ > .col {
+        padding: 0.4rem;
+    }
+    
+    .experts-templ .row {
+        margin: 0 -0.4rem;
     }
 }
 
 /* Мобильные устройства (420px - 600px) */
 @media (max-width: 600px) {
-    .experts-body {
-        padding: 65px 0 0 0;
+    .experts-sticky-header {
+        padding: 8px 0;
     }
 
     .experts-s-t {
-        font-size: 18px;
+        font-size: clamp(15px, 3vw, 17px);
         margin-left: 10px;
         margin-bottom: 8px;
     }
 
     .experts-s-f {
         max-width: 100% !important;
-        margin: 8px 10px 12px 10px !important;
+        margin: 0 10px 10px 10px !important;
     }
 
     .experts-s-f .form-control {
-        font-size: 13px !important;
+        font-size: clamp(12px, 2.5vw, 13px) !important;
         padding: 9px 10px !important;
     }
 
     .experts-s-f .btn {
-        font-size: 13px !important;
+        font-size: clamp(12px, 2.5vw, 13px) !important;
         padding: 9px 14px !important;
     }
 
@@ -311,45 +359,48 @@ html {
     }
 
     .cart-wrapper img {
-        width: 45px !important;
-        height: 45px !important;
+        width: 43px !important;
+        height: 43px !important;
     }
 
     .experts-templ {
-        gap: 18px !important;
-        padding: 0 10px;
+        padding: 0 8px;
         margin: 10px auto 15px;
     }
-
-    .expert-crd-img {
-        padding-top: 75%;
+    
+    .experts-templ > .col {
+        padding: 0.3rem;
+    }
+    
+    .experts-templ .row {
+        margin: 0 -0.3rem;
     }
 }
 
 /* Маленькие смартфоны (до 420px) */
 @media (max-width: 420px) {
-    .experts-body {
-        padding: 60px 0 0 0;
+    .experts-sticky-header {
+        padding: 6px 0;
     }
 
     .experts-s-t {
-        font-size: 16px;
+        font-size: clamp(14px, 3.5vw, 16px);
         margin-left: 8px;
         margin-bottom: 6px;
     }
 
     .experts-s-f {
         max-width: 100% !important;
-        margin: 6px 8px 10px 8px !important;
+        margin: 0 8px 8px 8px !important;
     }
 
     .experts-s-f .form-control {
-        font-size: 12px !important;
+        font-size: clamp(11px, 3vw, 12px) !important;
         padding: 8px 9px !important;
     }
 
     .experts-s-f .btn {
-        font-size: 12px !important;
+        font-size: clamp(11px, 3vw, 12px) !important;
         padding: 8px 12px !important;
     }
 
@@ -358,20 +409,27 @@ html {
     }
 
     .cart-wrapper img {
-        width: 40px !important;
-        height: 40px !important;
+        width: 38px !important;
+        height: 38px !important;
     }
 
     .experts-templ {
-        gap: 15px !important;
-        padding: 0 8px;
+        padding: 0 6px;
         margin: 8px auto 12px;
+    }
+    
+    .experts-templ > .col {
+        padding: 0.25rem;
+    }
+    
+    .experts-templ .row {
+        margin: 0 -0.25rem;
     }
 }
 
 /* Десктоп и большие экраны */
 @media (min-width: 769px) {
     .expert-crd-img {
-        padding-top: 60%;
+        aspect-ratio: 5 / 3;
     }
 }
