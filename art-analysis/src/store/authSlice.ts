@@ -16,13 +16,10 @@ export interface AuthState {
   error: string | null;
 }
 
-const storedToken = localStorage.getItem('authToken');
-const storedUser = localStorage.getItem('userInfo');
-
 const initialState: AuthState = {
-  isAuth: !!storedToken,
-  user: storedUser ? JSON.parse(storedUser) : null,
-  token: storedToken || null,
+  isAuth: false,
+  user: null,
+  token: null,
   loading: false,
   error: null,
 };
